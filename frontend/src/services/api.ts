@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth-fetch";
 import { NodeStatus, OutputNodeData, useNodeContext } from '@/contexts/node-context';
 import { Agent } from '@/data/agents';
 import { LanguageModel } from '@/data/models';
@@ -16,12 +17,14 @@ export const api = {
    */
   getAgents: async (): Promise<Agent[]> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/hedge-fund/agents`);
+      const response = await authFetch(`${API_BASE_URL}/hedge-fund/agents`);
+      console.log('getAgents response status:', response.status);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      return data.agents;
+      console.log('getAgents response data:', data);
+      return data.agents || [];
     } catch (error) {
       console.error('Failed to fetch agents:', error);
       throw error;
@@ -34,7 +37,7 @@ export const api = {
    */
   getLanguageModels: async (): Promise<LanguageModel[]> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/language-models/`);
+      const response = await authFetch(`${API_BASE_URL}/language-models/`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -54,7 +57,7 @@ export const api = {
    */
   saveJsonFile: async (filename: string, data: any): Promise<void> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/storage/save-json`, {
+      const response = await authFetch(`${API_BASE_URL}/storage/save-json`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +109,7 @@ export const api = {
     const { signal } = controller;
 
     // Make a POST request with the JSON body
-    fetch(`${API_BASE_URL}/hedge-fund/run`, {
+    authFetch(`${API_BASE_URL}/hedge-fund/run`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

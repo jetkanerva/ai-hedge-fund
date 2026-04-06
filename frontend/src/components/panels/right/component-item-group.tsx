@@ -2,6 +2,7 @@ import ComponentItem from '@/components/panels/right/component-item';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useFlowContext } from '@/contexts/flow-context';
 import { ComponentGroup } from '@/data/sidebar-components';
+import { toast } from 'sonner';
 
 interface ComponentItemGroupProps {
   group: ComponentGroup;
@@ -18,8 +19,10 @@ export function ComponentItemGroup({
   const handleItemClick = async (componentName: string) => {
     try {
       await addComponentToFlow(componentName);
+      toast.success(`Added ${componentName} to flow`);
     } catch (error) {
       console.error('Failed to add component to flow:', error);
+      toast.error(`Failed to add ${componentName}: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
   

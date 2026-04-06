@@ -7,7 +7,7 @@ from langgraph.graph import END, StateGraph
 from backend.services.agent_service import create_agent_function
 from backend.agents.portfolio_manager import portfolio_management_agent
 from backend.agents.risk_manager import risk_management_agent
-from backend.cli_main import start
+from backend.dev.cli.cli_main import start
 from backend.utils.analysts import ANALYST_CONFIG
 from backend.graph.state import AgentState
 

@@ -17,7 +17,13 @@ interface UseKeyboardShortcutsProps {
 export function useKeyboardShortcuts({ shortcuts }: UseKeyboardShortcutsProps) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore if event.key is undefined
+      if (!event || typeof event.key !== 'string') return;
+      
       shortcuts.forEach(({ key, ctrlKey, metaKey, shiftKey, altKey, callback, preventDefault = true }) => {
+        // Skip if shortcut doesn't have a key defined
+        if (!key || typeof key !== 'string') return;
+        
         const isCtrlMatch = ctrlKey ? event.ctrlKey : !event.ctrlKey;
         const isMetaMatch = metaKey ? event.metaKey : !event.metaKey;
         const isShiftMatch = shiftKey ? event.shiftKey : !event.shiftKey;

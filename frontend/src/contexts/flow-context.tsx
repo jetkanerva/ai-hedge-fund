@@ -9,7 +9,7 @@ import { createContext, ReactNode, useCallback, useContext, useState } from 'rea
 
 interface FlowContextType {
   addComponentToFlow: (componentName: string) => Promise<void>;
-  saveCurrentFlow: (name?: string, description?: string) => Promise<Flow | null>;
+  saveCurrentFlow: (name?: string, description?: string, overrideNodes?: any[], overrideEdges?: any[]) => Promise<Flow | null>;
   loadFlow: (flow: Flow) => Promise<void>;
   createNewFlow: () => Promise<void>;
   currentFlowId: number | null;
@@ -40,27 +40,34 @@ export function FlowProvider({ children }: FlowProviderProps) {
 
   // Calculate viewport center position with optional randomness
   const getViewportPosition = useCallback((addRandomness = false): XYPosition => {
-    let position: XYPosition = { x: 0, y: 0 }; // Default position
+    let position: XYPosition = { x: 100, y: 100 }; // Default position, slightly offset from 0,0
     
     try {
-      const { zoom, x, y } = reactFlowInstance.getViewport();
+      const viewport = reactFlowInstance.getViewport();
+      const zoom = viewport.zoom || 1;
+      const x = viewport.x || 0;
+      const y = viewport.y || 0;
       
       // Get the React Flow container dimensions instead of window dimensions
       const flowContainer = document.querySelector('.react-flow__viewport')?.parentElement;
-      const containerWidth = flowContainer?.clientWidth || window.innerWidth;
-      const containerHeight = flowContainer?.clientHeight || window.innerHeight;
       
-      position = {
-        x: (containerWidth / 2 - x) / zoom,
-        y: (containerHeight / 2 - y) / zoom,
-      };
+      // If we found the container, center the new node in the viewport
+      if (flowContainer) {
+        const containerWidth = flowContainer.clientWidth;
+        const containerHeight = flowContainer.clientHeight;
+        
+        position = {
+          x: (containerWidth / 2 - x) / zoom,
+          y: (containerHeight / 2 - y) / zoom,
+        };
+      }
     } catch (err) {
       console.warn('Could not get viewport', err);
     }
     
     if (addRandomness) {
-      position.x += Math.random() * 300;
-      position.y = 0;
+      position.x += (Math.random() - 0.5) * 100;
+      position.y += (Math.random() - 0.5) * 100;
     }
     
     return position;
@@ -72,14 +79,17 @@ export function FlowProvider({ children }: FlowProviderProps) {
   }, []);
 
   // Save current flow
-  const saveCurrentFlow = useCallback(async (name?: string, description?: string): Promise<Flow | null> => {
+  const saveCurrentFlow = useCallback(async (name?: string, description?: string, overrideNodes?: any[], overrideEdges?: any[]): Promise<Flow | null> => {
     try {
-      const nodes = reactFlowInstance.getNodes();
-      const edges = reactFlowInstance.getEdges();
+      // Sometimes getNodes/getEdges can be slightly stale if a re-render is pending
+      const nodes = overrideNodes || reactFlowInstance.getNodes() || [];
+      const edges = overrideEdges || reactFlowInstance.getEdges() || [];
       const viewport = reactFlowInstance.getViewport();
       
+      console.log(`[saveCurrentFlow] saving ${nodes.length} nodes and ${edges.length} edges`);
+      
       // Collect all node internal states (from use-node-state)
-      const nodeStates = getAllNodeStates();
+      const nodeStates = getAllNodeStates() || new Map();
       const nodeInternalStates = Object.fromEntries(nodeStates);
 
       // Create structured data - nodeContextData will be added by enhanced save functions
@@ -113,14 +123,11 @@ export function FlowProvider({ children }: FlowProviderProps) {
           nodes,
           edges,
           viewport,
-          data,
+          data
         });
         setCurrentFlowId(newFlow.id);
         setCurrentFlowName(newFlow.name);
         setIsUnsaved(false);
-        // Remember this flow as the last selected
-        localStorage.setItem('lastSelectedFlowId', newFlow.id.toString());
-        // Set the flow ID for node state isolation
         setNodeStateFlowId(newFlow.id.toString());
         return newFlow;
       }
@@ -149,14 +156,24 @@ export function FlowProvider({ children }: FlowProviderProps) {
           Object.entries(dataToRestore).forEach(([nodeId, nodeState]) => {
             setNodeInternalState(nodeId, nodeState as Record<string, any>);
           });
-        }
-        
+        }  
         // nodeContextData restoration will be handled by enhanced load functions
       }
       
       // Now render the nodes - useNodeState hooks will initialize with correct flow ID
-      reactFlowInstance.setNodes(flow.nodes || []);
-      reactFlowInstance.setEdges(flow.edges || []);
+      const nodesArray = Array.isArray(flow.nodes) ? flow.nodes : [];
+      const edgesArray = Array.isArray(flow.edges) ? flow.edges : [];
+      
+      reactFlowInstance.setNodes(nodesArray);
+      reactFlowInstance.setEdges(edgesArray);
+      
+      // Force a re-render to ensure nodes appear immediately
+      setTimeout(() => {
+        try {
+          reactFlowInstance.setNodes((nds) => [...nds]);
+          reactFlowInstance.setEdges((eds) => [...eds]);
+        } catch(e) {}
+      }, 50);
       
       if (flow.viewport) {
         reactFlowInstance.setViewport(flow.viewport);
@@ -201,7 +218,15 @@ export function FlowProvider({ children }: FlowProviderProps) {
       // Clear the React Flow canvas
       reactFlowInstance.setNodes([]);
       reactFlowInstance.setEdges([]);
-      reactFlowInstance.setViewport({ x: 0, y: 0, zoom: 1 });
+      
+      // Reset viewport safely
+      setTimeout(() => {
+        try {
+          reactFlowInstance.setViewport({ x: 0, y: 0, zoom: 1 });
+        } catch (e) {
+          // ignore
+        }
+      }, 50);
 
       setIsUnsaved(false);
 
@@ -219,17 +244,76 @@ export function FlowProvider({ children }: FlowProviderProps) {
       const nodeTypeDefinition = await getNodeTypeDefinition(componentName);
       if (!nodeTypeDefinition) {
         console.warn(`No node type definition found for component: ${componentName}`);
-        return;
+        throw new Error(`No node type definition found for component: ${componentName}`);
       }
 
-      const position = getViewportPosition(false);
+      const position = getViewportPosition(true); // Add randomness so nodes don't stack perfectly
       const newNode = nodeTypeDefinition.createNode(position);
-      reactFlowInstance.setNodes((nodes) => [...nodes, newNode]);
-      markAsUnsaved();
+      
+      // Calculate a center-ish position in case getViewportPosition fails
+      if (Math.abs(position.x - 100) <= 50 && Math.abs(position.y - 100) <= 50) {
+         try {
+           const viewport = reactFlowInstance.getViewport();
+           const zoom = viewport.zoom || 1;
+           const x = viewport.x || 0;
+           const y = viewport.y || 0;
+           const flowContainer = document.querySelector('.react-flow__viewport')?.parentElement;
+           const windowWidth = flowContainer ? flowContainer.clientWidth : window.innerWidth;
+           const windowHeight = flowContainer ? flowContainer.clientHeight : window.innerHeight;
+           newNode.position = {
+             x: (windowWidth / 2 - x) / zoom + (Math.random() - 0.5) * 50,
+             y: (windowHeight / 2 - y) / zoom + (Math.random() - 0.5) * 50,
+           };
+         } catch (e) {
+           // Ignore viewport errors
+         }
+      }
+      
+      console.log('Adding new node to flow:', newNode);
+      
+      // Try adding via React Flow's internal store if possible (newer versions of xyflow)
+        // If we don't have access to addNodes directly, we rely on setNodes
+        if (typeof reactFlowInstance.addNodes === 'function') {
+          try {
+            reactFlowInstance.addNodes(newNode);
+          } catch (e) {
+            console.warn("addNodes failed, falling back to setNodes", e);
+            reactFlowInstance.setNodes((currentNodes) => {
+              if (currentNodes.some(n => n.id === newNode.id)) return currentNodes;
+              return [...currentNodes, newNode];
+            });
+          }
+        } else {
+          reactFlowInstance.setNodes((currentNodes) => {
+            if (currentNodes.some(n => n.id === newNode.id)) return currentNodes;
+            return [...currentNodes, newNode];
+          });
+        }
+        
+        // Ensure state updates properly
+      setTimeout(() => {
+        try {
+          reactFlowInstance.setNodes((nds) => [...nds]);
+        } catch (e) {}
+      }, 10);
+      // Update state without wrapping in another function
+      setIsUnsaved(true);
+      
+      // Give React Flow a moment to process the node addition before forcing pan
+      setTimeout(() => {
+        try {
+          const vp = reactFlowInstance.getViewport();
+          reactFlowInstance.setViewport({ ...vp, x: vp.x + 0.01 });
+        } catch (e) {
+          // Ignore viewport error
+        }
+      }, 100);
+      
     } catch (error) {
       console.error(`Failed to add component ${componentName} to flow:`, error);
+      throw error;
     }
-  }, [reactFlowInstance, getViewportPosition, markAsUnsaved]);
+  }, [reactFlowInstance, getViewportPosition]);
 
   // Add a multi node (group of nodes with edges) to the flow
   const addMultipleNodesToFlow = useCallback(async (name: string) => {
@@ -237,7 +321,7 @@ export function FlowProvider({ children }: FlowProviderProps) {
       const multiNodeDefinition = getMultiNodeDefinition(name);
       if (!multiNodeDefinition) {
         console.warn(`No multi node definition found for: ${name}`);
-        return;
+        throw new Error(`No multi node definition found for: ${name}`);
       }
 
       const basePosition = getViewportPosition();
@@ -316,19 +400,54 @@ export function FlowProvider({ children }: FlowProviderProps) {
         };
       }).filter((edge): edge is NonNullable<typeof edge> => edge !== null);
 
-      // Add nodes and edges to flow
-      reactFlowInstance.setNodes((nodes) => [...nodes, ...validNodes]);
-      reactFlowInstance.setEdges((edges) => [...edges, ...newEdges]);
-      markAsUnsaved();
+        if (typeof reactFlowInstance.addNodes === 'function') {
+          try {
+            reactFlowInstance.addNodes(validNodes);
+            reactFlowInstance.addEdges(newEdges);
+          } catch (e) {
+            console.warn("addNodes/addEdges failed", e);
+            reactFlowInstance.setNodes((currentNodes) => {
+              const uniqueNewNodes = validNodes.filter(n => !currentNodes.some(cn => cn.id === n.id));
+              return [...currentNodes, ...uniqueNewNodes];
+            });
+            reactFlowInstance.setEdges((currentEdges) => {
+              const uniqueNewEdges = newEdges.filter(e => !currentEdges.some(ce => ce.id === e.id));
+              return [...currentEdges, ...uniqueNewEdges];
+            });
+          }
+        } else {
+          reactFlowInstance.setNodes((currentNodes) => {
+            const uniqueNewNodes = validNodes.filter(n => !currentNodes.some(cn => cn.id === n.id));
+            return [...currentNodes, ...uniqueNewNodes];
+          });
+          reactFlowInstance.setEdges((currentEdges) => {
+            const uniqueNewEdges = newEdges.filter(e => !currentEdges.some(ce => ce.id === e.id));
+            return [...currentEdges, ...uniqueNewEdges];
+          });
+        }
+        
+        // Ensure state updates properly
+        setTimeout(() => {
+          try {
+            reactFlowInstance.setNodes((nds) => [...nds]);
+            reactFlowInstance.setEdges((eds) => [...eds]);
+          } catch (e) {}
+        }, 10);
+      setIsUnsaved(true);
       
       // Fit view to show all nodes after a short delay to ensure nodes are rendered
       setTimeout(() => {
-        reactFlowInstance.fitView({ padding: 0.1, duration: 500 });
+        try {
+          reactFlowInstance.fitView({ padding: 0.1, duration: 500 });
+        } catch (e) {
+          // ignore
+        }
       }, 100);
     } catch (error) {
-      console.error(`Failed to add multi-node component ${name} to flow:`, error);
+      console.error(`Failed to add multi node ${name} to flow:`, error);
+      throw error;
     }
-  }, [reactFlowInstance, getViewportPosition, markAsUnsaved]);
+  }, [reactFlowInstance, getViewportPosition]);
 
   // Main entry point - route to single node or multi node
   const addComponentToFlow = useCallback(async (componentName: string) => {

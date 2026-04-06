@@ -14,7 +14,7 @@ from backend.utils.display import print_trading_output
 from backend.utils.analysts import ANALYST_ORDER, get_analyst_nodes
 from backend.utils.progress import progress
 from backend.utils.visualize import save_graph_as_png
-from backend.cli.input import (
+from backend.dev.cli.input import (
     parse_cli_inputs,
 )
 

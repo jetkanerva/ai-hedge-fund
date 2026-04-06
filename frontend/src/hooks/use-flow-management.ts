@@ -57,8 +57,9 @@ export function useFlowManagement(): UseFlowManagementReturn {
   // Enhanced save function that includes internal node states AND node context data
   const saveCurrentFlowWithStates = useCallback(async (): Promise<Flow | null> => {
     try {
-      // Get current nodes from React Flow
-      const currentNodes = reactFlowInstance.getNodes();
+      // Get current nodes from React Flow directly BEFORE mapping
+      const currentNodes = reactFlowInstance.getNodes() || [];
+      console.log(`[saveCurrentFlowWithStates] found ${currentNodes.length} nodes in React Flow instance`);
       
       // Get node context data (runtime data: agent status, messages, output data)
       const flowId = currentFlowId?.toString() || null;
@@ -81,8 +82,10 @@ export function useFlowManagement(): UseFlowManagementReturn {
       reactFlowInstance.setNodes(nodesWithStates);
       
       try {
-        // Use the context's save function which handles currentFlowId properly
-        const savedFlow = await saveCurrentFlow();
+        // Pass the explicit nodes and edges to the save function
+        // because setNodes above is async and getNodes inside saveCurrentFlow might miss them
+        const currentEdges = reactFlowInstance.getEdges() || [];
+        const savedFlow = await saveCurrentFlow(undefined, undefined, nodesWithStates, currentEdges);
         
         if (savedFlow) {
           // After basic save, update with node context data
@@ -123,7 +126,7 @@ export function useFlowManagement(): UseFlowManagementReturn {
       await loadFlow(flow);
 
       // Then restore internal states for each node (use-node-state data)
-      if (flow.nodes) {
+      if (flow.nodes && Array.isArray(flow.nodes)) {
         flow.nodes.forEach((node: any) => {
           if (node.data?.internal_state) {
             setNodeInternalState(node.id, node.data.internal_state);

@@ -47,6 +47,9 @@ export function FlowCreateDialog({ isOpen, onClose, onFlowCreated }: FlowCreateD
         nodes: [],
         edges: [],
         viewport: { x: 0, y: 0, zoom: 1 },
+        data: {
+          nodeStates: {}
+        }
       });
       
       success(`"${newFlow.name}" created!`);

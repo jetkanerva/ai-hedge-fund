@@ -9,11 +9,10 @@ import {
   NodeChange,
   ReactFlow,
   addEdge,
-  useReactFlow,
-  useNodes,
-  useEdges,
   applyNodeChanges,
-  applyEdgeChanges
+  applyEdgeChanges,
+  useNodes,
+  useEdges
 } from '@xyflow/react';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -40,14 +39,13 @@ export function Flow({ className = '' }: FlowProps) {
   // Use the resolved theme for ReactFlow ColorMode
   const colorMode: ColorMode = resolvedTheme === 'light' ? 'light' : 'dark';
   
-  const { setNodes, setEdges } = useReactFlow<AppNode, Edge>();
-  const nodes = useNodes<AppNode>();
-  const edges = useEdges<Edge>();
   const [isInitialized, setIsInitialized] = useState(false);
   const proOptions = { hideAttribution: true };
   
-  // Get flow context for flow ID
-  const { currentFlowId } = useFlowContext();
+  const { currentFlowId, reactFlowInstance } = useFlowContext();
+  
+  const nodes = useNodes<AppNode>();
+  const edges = useEdges();
   
   // Get enhanced flow actions for complete state persistence
   const { saveCurrentFlowWithCompleteState } = useEnhancedFlowActions();
@@ -94,9 +92,9 @@ export function Flow({ className = '' }: FlowProps) {
 
   // Enhanced onNodesChange handler with auto-save for specific change types
   const handleNodesChange = useCallback((changes: NodeChange<AppNode>[]) => {
-    // Apply the changes first
-    setNodes((nds) => applyNodeChanges(changes, nds) as AppNode[]);
-    
+    // Manually apply changes to internal store in uncontrolled mode
+    reactFlowInstance.setNodes((nds) => applyNodeChanges(changes, nds));
+
     // Check if any of the changes should trigger auto-save
     const shouldAutoSave = changes.some(change => {
       switch (change.type) {
@@ -121,13 +119,13 @@ export function Flow({ className = '' }: FlowProps) {
       const flowIdAtTimeOfChange = currentFlowId;
       autoSave(flowIdAtTimeOfChange);
     }
-  }, [setNodes, autoSave, isInitialized, currentFlowId]);
+  }, [autoSave, isInitialized, currentFlowId, reactFlowInstance]);
 
   // Enhanced onEdgesChange handler with auto-save for edge removal
   const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
-    // Apply the changes first
-    setEdges((eds) => applyEdgeChanges(changes, eds));
-    
+    // Manually apply changes to internal store in uncontrolled mode
+    reactFlowInstance.setEdges((eds) => applyEdgeChanges(changes, eds));
+
     // Check if any of the changes should trigger auto-save
     const shouldAutoSave = changes.some(change => {
       switch (change.type) {
@@ -144,7 +142,7 @@ export function Flow({ className = '' }: FlowProps) {
       const flowIdAtTimeOfChange = currentFlowId;
       autoSave(flowIdAtTimeOfChange);
     }
-  }, [setEdges, autoSave, isInitialized, currentFlowId]);
+  }, [autoSave, isInitialized, currentFlowId, reactFlowInstance]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -251,7 +249,7 @@ export function Flow({ className = '' }: FlowProps) {
           type: MarkerType.ArrowClosed,
         },
       };
-      setEdges((eds) => addEdge(newEdge, eds));
+      reactFlowInstance.setEdges((eds: Edge[]) => addEdge(newEdge, eds));
       
       // Auto-save new connections immediately (structural change)
       if (currentFlowId) {
@@ -278,7 +276,7 @@ export function Flow({ className = '' }: FlowProps) {
         }, 100);
       }
     },
-    [setEdges, currentFlowId, saveCurrentFlowWithCompleteState]
+    [reactFlowInstance, currentFlowId, saveCurrentFlowWithCompleteState]
   );
 
   // Theme-aware background colors
@@ -292,10 +290,10 @@ export function Flow({ className = '' }: FlowProps) {
     <div className={`w-full h-full ${className}`}>
       <TooltipProvider>
         <ReactFlow
-          nodes={nodes}
+          defaultNodes={[]}
+          defaultEdges={[]}
           nodeTypes={nodeTypes}
           onNodesChange={handleNodesChange}
-          edges={edges}
           edgeTypes={edgeTypes}
           onEdgesChange={handleEdgesChange}
           onConnect={onConnect}

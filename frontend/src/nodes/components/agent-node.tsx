@@ -77,9 +77,9 @@ export function AgentNode({
     setSelectedModel(model);
   };
 
-  const handleUseGlobalModel = () => {
-    setSelectedModel(null);
-  };
+  // const handleUseGlobalModel = () => {
+  //   setSelectedModel(null);
+  // };
 
   return (
     <NodeShell

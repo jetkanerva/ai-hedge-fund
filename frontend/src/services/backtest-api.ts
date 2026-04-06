@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth-fetch";
 import { NodeStatus, useNodeContext } from '@/contexts/node-context';
 import { extractBaseAgentKey } from '@/data/node-mappings';
 import { flowConnectionManager } from '@/hooks/use-flow-connection';
@@ -27,7 +28,7 @@ export const backtestApi = {
     const { signal } = controller;
 
     // Make a POST request to the backtest endpoint
-    fetch(`${API_BASE_URL}/hedge-fund/backtest`, {
+    authFetch(`${API_BASE_URL}/hedge-fund/backtest`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

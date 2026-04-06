@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth-fetch";
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export interface ApiKey {
@@ -48,7 +49,7 @@ class ApiKeysService {
       params.append('include_inactive', 'true');
     }
     
-    const response = await fetch(`${this.baseUrl}?${params}`);
+    const response = await authFetch(`${this.baseUrl}?${params}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch API keys: ${response.statusText}`);
     }
@@ -56,7 +57,7 @@ class ApiKeysService {
   }
 
   async getApiKey(provider: string): Promise<ApiKey> {
-    const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}`);
+    const response = await authFetch(`${this.baseUrl}/${encodeURIComponent(provider)}`);
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error('API key not found');
@@ -67,7 +68,7 @@ class ApiKeysService {
   }
 
   async createOrUpdateApiKey(request: ApiKeyCreateRequest): Promise<ApiKey> {
-    const response = await fetch(this.baseUrl, {
+    const response = await authFetch(this.baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ class ApiKeysService {
   }
 
   async updateApiKey(provider: string, request: ApiKeyUpdateRequest): Promise<ApiKey> {
-    const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}`, {
+    const response = await authFetch(`${this.baseUrl}/${encodeURIComponent(provider)}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ class ApiKeysService {
   }
 
   async deleteApiKey(provider: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}`, {
+    const response = await authFetch(`${this.baseUrl}/${encodeURIComponent(provider)}`, {
       method: 'DELETE',
     });
     
@@ -113,7 +114,7 @@ class ApiKeysService {
   }
 
   async deactivateApiKey(provider: string): Promise<ApiKeySummary> {
-    const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}/deactivate`, {
+    const response = await authFetch(`${this.baseUrl}/${encodeURIComponent(provider)}/deactivate`, {
       method: 'PATCH',
     });
     
@@ -127,7 +128,7 @@ class ApiKeysService {
   }
 
   async bulkUpdateApiKeys(request: ApiKeyBulkUpdateRequest): Promise<ApiKey[]> {
-    const response = await fetch(`${this.baseUrl}/bulk`, {
+    const response = await authFetch(`${this.baseUrl}/bulk`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ class ApiKeysService {
   }
 
   async updateLastUsed(provider: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}/last-used`, {
+    const response = await authFetch(`${this.baseUrl}/${encodeURIComponent(provider)}/last-used`, {
       method: 'PATCH',
     });
     

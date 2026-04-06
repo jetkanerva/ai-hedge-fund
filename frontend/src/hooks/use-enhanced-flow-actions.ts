@@ -20,8 +20,9 @@ export function useEnhancedFlowActions() {
   // Enhanced save that includes node context data
   const saveCurrentFlowWithCompleteState = useCallback(async (name?: string, description?: string): Promise<Flow | null> => {
     try {
-      // Get current nodes from React Flow
-      const currentNodes = reactFlowInstance.getNodes();
+      // Get current nodes from React Flow directly BEFORE mapping
+      const currentNodes = reactFlowInstance.getNodes() || [];
+      console.log(`[EnhancedSave] found ${currentNodes.length} nodes in React Flow instance`);
       
       // Get node context data (runtime data: agent status, messages, output data)
       const flowId = currentFlowId?.toString() || null;
@@ -44,8 +45,14 @@ export function useEnhancedFlowActions() {
       reactFlowInstance.setNodes(nodesWithStates);
       
       try {
-        // Use the basic save function
-        const savedFlow = await saveCurrentFlow(name, description);
+        // Wait a tiny bit to ensure React Flow internal state is updated
+        await new Promise(resolve => setTimeout(resolve, 50));
+        
+        // Pass the EXPLICIT nodes and edges directly to the basic save function
+        // because setting nodes via setNodes is asynchronous and reactFlowInstance.getNodes()
+        // inside saveCurrentFlow might read the old empty state
+        const currentEdges = reactFlowInstance.getEdges() || [];
+        const savedFlow = await saveCurrentFlow(name, description, nodesWithStates, currentEdges);
         
         if (savedFlow) {
           // After basic save, update with node context data
