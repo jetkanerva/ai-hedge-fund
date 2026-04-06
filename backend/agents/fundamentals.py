@@ -1,10 +1,10 @@
 from langchain_core.messages import HumanMessage
-from app.backend.graph.state import AgentState, show_agent_reasoning
-from app.backend.utils.api_key import get_api_key_from_state
-from app.backend.utils.progress import progress
+from backend.graph.state import AgentState, show_agent_reasoning
+from backend.utils.api_key import get_api_key_from_state
+from backend.utils.progress import progress
 import json
 
-from app.backend.tools.api import get_financial_metrics
+from backend.tools.api import get_financial_metrics
 
 
 ##### Fundamental Agent #####

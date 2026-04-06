@@ -5,15 +5,15 @@ import numpy as np
 from typing import Callable, Dict, List, Optional, Any
 import asyncio
 
-from app.backend.tools.api import (
+from backend.tools.api import (
     get_company_news,
     get_price_data,
     get_prices,
     get_financial_metrics,
     get_insider_trades,
 )
-from app.backend.services.graph import run_graph_async, parse_hedge_fund_response
-from app.backend.services.portfolio import create_portfolio
+from backend.services.graph import run_graph_async, parse_hedge_fund_response
+from backend.services.portfolio import create_portfolio
 
 class BacktestService:
     """

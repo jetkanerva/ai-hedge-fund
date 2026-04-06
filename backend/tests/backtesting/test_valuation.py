@@ -1,4 +1,4 @@
-from app.backend.backtesting.valuation import calculate_portfolio_value, compute_exposures, compute_portfolio_summary
+from backend.backtesting.valuation import calculate_portfolio_value, compute_exposures, compute_portfolio_summary
 
 
 def test_calculate_portfolio_value(portfolio, prices):

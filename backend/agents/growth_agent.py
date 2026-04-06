@@ -8,10 +8,10 @@ Implements a growth-focused valuation methodology.
 import json
 import statistics
 from langchain_core.messages import HumanMessage
-from app.backend.graph.state import AgentState, show_agent_reasoning
-from app.backend.utils.progress import progress
-from app.backend.utils.api_key import get_api_key_from_state
-from app.backend.tools.api import (
+from backend.graph.state import AgentState, show_agent_reasoning
+from backend.utils.progress import progress
+from backend.utils.api_key import get_api_key_from_state
+from backend.tools.api import (
     get_financial_metrics,
     get_insider_trades,
 )

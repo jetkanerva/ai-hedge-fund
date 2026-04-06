@@ -4,7 +4,7 @@ from typing import List, Mapping, Sequence
 
 from .portfolio import Portfolio
 from .types import AgentOutput
-from app.backend.utils.display import format_backtest_row, print_backtest_results
+from backend.utils.display import format_backtest_row, print_backtest_results
 from .valuation import compute_portfolio_summary
 
 

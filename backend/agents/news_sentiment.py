@@ -2,16 +2,16 @@
 
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, Field
-from app.backend.data.models import CompanyNews
+from backend.data.models import CompanyNews
 import pandas as pd
 import numpy as np
 import json
 
-from app.backend.graph.state import AgentState, show_agent_reasoning
-from app.backend.tools.api import get_company_news
-from app.backend.utils.api_key import get_api_key_from_state
-from app.backend.utils.llm import call_llm
-from app.backend.utils.progress import progress
+from backend.graph.state import AgentState, show_agent_reasoning
+from backend.tools.api import get_company_news
+from backend.utils.api_key import get_api_key_from_state
+from backend.utils.llm import call_llm
+from backend.utils.progress import progress
 from typing_extensions import Literal
 
 

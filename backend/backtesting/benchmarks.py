@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from app.backend.tools.api import get_price_data
+from backend.tools.api import get_price_data
 
 
 class BenchmarkCalculator:

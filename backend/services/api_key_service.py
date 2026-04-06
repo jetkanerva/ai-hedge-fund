@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import Dict, Optional
-from app.backend.repositories.api_key_repository import ApiKeyRepository
+from backend.repositories.api_key_repository import ApiKeyRepository
 
 
 class ApiKeyService:

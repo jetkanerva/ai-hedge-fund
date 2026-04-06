@@ -1,6 +1,6 @@
 from functools import partial
 from typing import Callable
-from app.backend.graph.state import AgentState
+from backend.graph.state import AgentState
 
 def create_agent_function(agent_function: Callable, agent_id: str) -> Callable[[AgentState], dict]:
     """

@@ -1,11 +1,11 @@
 from langchain_core.messages import HumanMessage
-from app.backend.graph.state import AgentState, show_agent_reasoning
-from app.backend.utils.progress import progress
+from backend.graph.state import AgentState, show_agent_reasoning
+from backend.utils.progress import progress
 import pandas as pd
 import numpy as np
 import json
-from app.backend.utils.api_key import get_api_key_from_state
-from app.backend.tools.api import get_insider_trades, get_company_news
+from backend.utils.api_key import get_api_key_from_state
+from backend.tools.api import get_insider_trades, get_company_news
 
 
 ##### Sentiment Agent #####

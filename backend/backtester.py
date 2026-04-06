@@ -1,11 +1,13 @@
 import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from colorama import Fore, Style
 
-from app.backend.cli_main import run_hedge_fund
-from app.backend.backtesting.engine import BacktestEngine
-from app.backend.backtesting.types import PerformanceMetrics
-from app.backend.cli.input import (
+from backend.cli_main import run_hedge_fund
+from backend.backtesting.engine import BacktestEngine
+from backend.backtesting.types import PerformanceMetrics
+from backend.cli.input import (
     parse_cli_inputs,
 )
 

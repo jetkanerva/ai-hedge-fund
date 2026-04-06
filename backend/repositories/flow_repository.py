@@ -1,6 +1,6 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.backend.database.models import HedgeFundFlow
+from backend.database.models import HedgeFundFlow
 
 
 class FlowRepository:

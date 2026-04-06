@@ -4,21 +4,21 @@ from datetime import datetime, timedelta
 import json
 from typing_extensions import Literal
 
-from app.backend.graph.state import AgentState, show_agent_reasoning
+from backend.graph.state import AgentState, show_agent_reasoning
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel
 
-from app.backend.tools.api import (
+from backend.tools.api import (
     get_company_news,
     get_financial_metrics,
     get_insider_trades,
     get_market_cap,
     search_line_items,
 )
-from app.backend.utils.llm import call_llm
-from app.backend.utils.progress import progress
-from app.backend.utils.api_key import get_api_key_from_state
+from backend.utils.llm import call_llm
+from backend.utils.progress import progress
+from backend.utils.api_key import get_api_key_from_state
 
 
 class MichaelBurrySignal(BaseModel):

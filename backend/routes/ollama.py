@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import logging
 
-from app.backend.models.schemas import ErrorResponse
-from app.backend.services.ollama_service import ollama_service
+from backend.models.schemas import ErrorResponse
+from backend.services.ollama_service import ollama_service
 
 logger = logging.getLogger(__name__)
 

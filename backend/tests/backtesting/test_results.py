@@ -1,4 +1,4 @@
-from app.backend.backtesting.output import OutputBuilder
+from backend.backtesting.output import OutputBuilder
 
 
 def test_results_builder_builds_rows_and_summary(monkeypatch, portfolio):
@@ -24,8 +24,8 @@ def test_results_builder_builds_rows_and_summary(monkeypatch, portfolio):
         printed["rows"] = rows
 
     # OutputBuilder imports these directly, so patch in its module
-    monkeypatch.setattr("app.backend.backtesting.output.format_backtest_row", fake_format_backtest_row)
-    monkeypatch.setattr("app.backend.backtesting.output.print_backtest_results", fake_print_backtest_results)
+    monkeypatch.setattr("backend.backtesting.output.format_backtest_row", fake_format_backtest_row)
+    monkeypatch.setattr("backend.backtesting.output.print_backtest_results", fake_print_backtest_results)
 
     rb = OutputBuilder(initial_capital=100_000.0)
 

@@ -3,11 +3,11 @@ import time
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 
-from app.backend.graph.state import AgentState, show_agent_reasoning
+from backend.graph.state import AgentState, show_agent_reasoning
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
-from app.backend.utils.progress import progress
-from app.backend.utils.llm import call_llm
+from backend.utils.progress import progress
+from backend.utils.llm import call_llm
 
 
 class PortfolioDecision(BaseModel):

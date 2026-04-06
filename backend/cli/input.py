@@ -5,9 +5,9 @@ import argparse
 import questionary
 from colorama import Fore, Style
 
-from app.backend.utils.analysts import ANALYST_ORDER
-from app.backend.llm.models import LLM_ORDER, OLLAMA_LLM_ORDER, get_model_info, ModelProvider, find_model_by_name
-from app.backend.utils.ollama import ensure_ollama_and_model
+from backend.utils.analysts import ANALYST_ORDER
+from backend.llm.models import LLM_ORDER, OLLAMA_LLM_ORDER, get_model_info, ModelProvider, find_model_by_name
+from backend.utils.ollama import ensure_ollama_and_model
 
 from dataclasses import dataclass
 from typing import Optional

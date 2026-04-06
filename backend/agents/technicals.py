@@ -2,14 +2,14 @@ import math
 
 from langchain_core.messages import HumanMessage
 
-from app.backend.graph.state import AgentState, show_agent_reasoning
-from app.backend.utils.api_key import get_api_key_from_state
+from backend.graph.state import AgentState, show_agent_reasoning
+from backend.utils.api_key import get_api_key_from_state
 import json
 import pandas as pd
 import numpy as np
 
-from app.backend.tools.api import get_prices, prices_to_df
-from app.backend.utils.progress import progress
+from backend.tools.api import get_prices, prices_to_df
+from backend.utils.progress import progress
 
 
 def safe_float(value, default=0.0):

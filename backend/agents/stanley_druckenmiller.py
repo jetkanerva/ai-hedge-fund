@@ -1,5 +1,5 @@
-from app.backend.graph.state import AgentState, show_agent_reasoning
-from app.backend.tools.api import (
+from backend.graph.state import AgentState, show_agent_reasoning
+from backend.tools.api import (
     get_financial_metrics,
     get_market_cap,
     search_line_items,
@@ -12,10 +12,10 @@ from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 import json
 from typing_extensions import Literal
-from app.backend.utils.progress import progress
-from app.backend.utils.llm import call_llm
+from backend.utils.progress import progress
+from backend.utils.llm import call_llm
 import statistics
-from app.backend.utils.api_key import get_api_key_from_state
+from backend.utils.api_key import get_api_key_from_state
 
 class StanleyDruckenmillerSignal(BaseModel):
     signal: Literal["bullish", "bearish", "neutral"]

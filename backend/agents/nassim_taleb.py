@@ -1,4 +1,4 @@
-from app.backend.graph.state import AgentState, show_agent_reasoning
+from backend.graph.state import AgentState, show_agent_reasoning
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, Field
@@ -9,7 +9,7 @@ from typing_extensions import Literal
 import numpy as np
 import pandas as pd
 
-from app.backend.tools.api import (
+from backend.tools.api import (
     get_company_news,
     get_financial_metrics,
     get_insider_trades,
@@ -18,9 +18,9 @@ from app.backend.tools.api import (
     prices_to_df,
     search_line_items,
 )
-from app.backend.utils.llm import call_llm
-from app.backend.utils.progress import progress
-from app.backend.utils.api_key import get_api_key_from_state
+from backend.utils.llm import call_llm
+from backend.utils.progress import progress
+from backend.utils.api_key import get_api_key_from_state
 
 
 class NassimTalebSignal(BaseModel):

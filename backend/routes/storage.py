@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from pydantic import BaseModel
 
-from app.backend.models.schemas import ErrorResponse
+from backend.models.schemas import ErrorResponse
 
 router = APIRouter(prefix="/storage")
 

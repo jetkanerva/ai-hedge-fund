@@ -42,7 +42,7 @@ dev = [
 ]
 
 [project.scripts]
-backtester = "app.backend.backtesting.cli:main"
+backtester = "backend.backtesting.cli:main"
 
 [build-system]
 requires = ["hatchling"]

@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Dict, Any
-from app.backend.llm.models import ModelProvider
+from backend.llm.models import ModelProvider
 from enum import Enum
-from app.backend.services.graph import extract_base_agent_key
+from backend.services.graph import extract_base_agent_key
 
 
 class FlowRunStatus(str, Enum):

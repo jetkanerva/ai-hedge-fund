@@ -4,9 +4,9 @@ import json
 import time
 import threading
 from pydantic import BaseModel
-from app.backend.llm.models import get_model, get_model_info
-from app.backend.utils.progress import progress
-from app.backend.graph.state import AgentState
+from backend.llm.models import get_model, get_model_info
+from backend.utils.progress import progress
+from backend.graph.state import AgentState
 
 # Global rate limit state
 _llm_lock = threading.Lock()

@@ -1,18 +1,20 @@
 import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langgraph.graph import END, StateGraph
 from colorama import Fore, Style, init
 import questionary
-from app.backend.agents.portfolio_manager import portfolio_management_agent
-from app.backend.agents.risk_manager import risk_management_agent
-from app.backend.graph.state import AgentState
-from app.backend.utils.display import print_trading_output
-from app.backend.utils.analysts import ANALYST_ORDER, get_analyst_nodes
-from app.backend.utils.progress import progress
-from app.backend.utils.visualize import save_graph_as_png
-from app.backend.cli.input import (
+from backend.agents.portfolio_manager import portfolio_management_agent
+from backend.agents.risk_manager import risk_management_agent
+from backend.graph.state import AgentState
+from backend.utils.display import print_trading_output
+from backend.utils.analysts import ANALYST_ORDER, get_analyst_nodes
+from backend.utils.progress import progress
+from backend.utils.visualize import save_graph_as_png
+from backend.cli.input import (
     parse_cli_inputs,
 )
 

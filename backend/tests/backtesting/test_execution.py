@@ -1,4 +1,4 @@
-from app.backend.backtesting.trader import TradeExecutor
+from backend.backtesting.trader import TradeExecutor
 
 
 def test_trade_executor_routes_actions(portfolio):

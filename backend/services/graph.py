@@ -4,12 +4,12 @@ import re
 from langchain_core.messages import HumanMessage
 from langgraph.graph import END, StateGraph
 
-from app.backend.services.agent_service import create_agent_function
-from app.backend.agents.portfolio_manager import portfolio_management_agent
-from app.backend.agents.risk_manager import risk_management_agent
-from app.backend.cli_main import start
-from app.backend.utils.analysts import ANALYST_CONFIG
-from app.backend.graph.state import AgentState
+from backend.services.agent_service import create_agent_function
+from backend.agents.portfolio_manager import portfolio_management_agent
+from backend.agents.risk_manager import risk_management_agent
+from backend.cli_main import start
+from backend.utils.analysts import ANALYST_CONFIG
+from backend.graph.state import AgentState
 
 
 def extract_base_agent_key(unique_id: str) -> str:

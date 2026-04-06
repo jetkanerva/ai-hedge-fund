@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.backend.database import get_db
-from app.backend.repositories.api_key_repository import ApiKeyRepository
-from app.backend.models.schemas import (
+from backend.database import get_db
+from backend.repositories.api_key_repository import ApiKeyRepository
+from backend.models.schemas import (
     ApiKeyCreateRequest,
     ApiKeyUpdateRequest,
     ApiKeyResponse,

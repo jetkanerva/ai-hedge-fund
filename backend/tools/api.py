@@ -8,8 +8,8 @@ import yfinance as yf
 
 logger = logging.getLogger(__name__)
 
-from app.backend.data.cache import get_cache
-from app.backend.data.models import (
+from backend.data.cache import get_cache
+from backend.data.models import (
     CompanyNews,
     FinancialMetrics,
     Price,

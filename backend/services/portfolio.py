@@ -1,6 +1,6 @@
 
 from typing import Optional, List
-from app.backend.models.schemas import PortfolioPosition
+from backend.models.schemas import PortfolioPosition
 
 
 def create_portfolio(initial_cash: float, margin_requirement: float, tickers: list[str], portfolio_positions: Optional[List[PortfolioPosition]] = None) -> dict:

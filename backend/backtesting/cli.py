@@ -9,10 +9,10 @@ from colorama import Fore, Style, init
 import questionary
 
 from .engine import BacktestEngine
-from app.backend.llm.models import LLM_ORDER, OLLAMA_LLM_ORDER, get_model_info, ModelProvider
-from app.backend.utils.analysts import ANALYST_ORDER
-from app.backend.cli_main import run_hedge_fund
-from app.backend.utils.ollama import ensure_ollama_and_model
+from backend.llm.models import LLM_ORDER, OLLAMA_LLM_ORDER, get_model_info, ModelProvider
+from backend.utils.analysts import ANALYST_ORDER
+from backend.cli_main import run_hedge_fund
+from backend.utils.ollama import ensure_ollama_and_model
 
 
 def main() -> int:

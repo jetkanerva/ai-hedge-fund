@@ -3,15 +3,15 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 import asyncio
 
-from app.backend.database import get_db
-from app.backend.models.schemas import ErrorResponse, HedgeFundRequest, BacktestRequest, BacktestDayResult, BacktestPerformanceMetrics
-from app.backend.models.events import StartEvent, ProgressUpdateEvent, ErrorEvent, CompleteEvent
-from app.backend.services.graph import create_graph, parse_hedge_fund_response, run_graph_async
-from app.backend.services.portfolio import create_portfolio
-from app.backend.services.backtest_service import BacktestService
-from app.backend.services.api_key_service import ApiKeyService
-from app.backend.utils.progress import progress
-from app.backend.utils.analysts import get_agents_list
+from backend.database import get_db
+from backend.models.schemas import ErrorResponse, HedgeFundRequest, BacktestRequest, BacktestDayResult, BacktestPerformanceMetrics
+from backend.models.events import StartEvent, ProgressUpdateEvent, ErrorEvent, CompleteEvent
+from backend.services.graph import create_graph, parse_hedge_fund_response, run_graph_async
+from backend.services.portfolio import create_portfolio
+from backend.services.backtest_service import BacktestService
+from backend.services.api_key_service import ApiKeyService
+from backend.utils.progress import progress
+from backend.utils.analysts import get_agents_list
 
 router = APIRouter(prefix="/hedge-fund")
 

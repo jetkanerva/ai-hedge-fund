@@ -1,6 +1,6 @@
 import pytest
 
-from app.backend.backtesting.portfolio import Portfolio
+from backend.backtesting.portfolio import Portfolio
 
 
 @pytest.fixture()
