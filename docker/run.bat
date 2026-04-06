@@ -290,12 +290,12 @@ if not exist .env (
 
 :: Set script path and parameters based on command
 if "!COMMAND!"=="main" (
-    set SCRIPT_PATH=src/main.py
+    set SCRIPT_PATH=app/backend/cli_main.py
     if "!COMMAND!"=="main" (
         set INITIAL_PARAM=--initial-cash !INITIAL_AMOUNT!
     )
 ) else if "!COMMAND!"=="backtest" (
-    set SCRIPT_PATH=src/backtester.py
+    set SCRIPT_PATH=app/backend/backtester.py
     if "!COMMAND!"=="backtest" (
         set INITIAL_PARAM=--initial-capital !INITIAL_AMOUNT!
     )
@@ -383,12 +383,12 @@ if not "!USE_OLLAMA!"=="" (
 
     if "!COMMAND!"=="main" (
         if not "!SHOW_REASONING!"=="" (
-            !COMPOSE_CMD! run --rm hedge-fund-reasoning python src/main.py --ticker !TICKER! !COMMAND_OVERRIDE! !SHOW_REASONING! --ollama
+            !COMPOSE_CMD! run --rm hedge-fund-reasoning python app/backend/cli_main.py --ticker !TICKER! !COMMAND_OVERRIDE! !SHOW_REASONING! --ollama
         ) else (
-            !COMPOSE_CMD! run --rm hedge-fund-ollama python src/main.py --ticker !TICKER! !COMMAND_OVERRIDE! --ollama
+            !COMPOSE_CMD! run --rm hedge-fund-ollama python app/backend/cli_main.py --ticker !TICKER! !COMMAND_OVERRIDE! --ollama
         )
     ) else if "!COMMAND!"=="backtest" (
-        !COMPOSE_CMD! run --rm backtester-ollama python src/backtester.py --ticker !TICKER! !COMMAND_OVERRIDE! !SHOW_REASONING! --ollama
+        !COMPOSE_CMD! run --rm backtester-ollama python app/backend/backtester.py --ticker !TICKER! !COMMAND_OVERRIDE! !SHOW_REASONING! --ollama
     )
 
     exit /b 0

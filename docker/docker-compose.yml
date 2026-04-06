@@ -22,7 +22,7 @@ services:
     image: ai-hedge-fund
     volumes:
       - ../.env:/app/.env
-    command: python src/main.py --ticker AAPL,MSFT,NVDA
+    command: python app/backend/cli_main.py --ticker AAPL,MSFT,NVDA
     environment:
       PYTHONUNBUFFERED: "1"
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
@@ -37,7 +37,7 @@ services:
     image: ai-hedge-fund
     volumes:
       - ../.env:/app/.env
-    command: python src/main.py --ticker AAPL,MSFT,NVDA --show-reasoning
+    command: python app/backend/cli_main.py --ticker AAPL,MSFT,NVDA --show-reasoning
     environment:
       PYTHONUNBUFFERED: "1"
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
@@ -52,7 +52,7 @@ services:
     image: ai-hedge-fund
     volumes:
       - ../.env:/app/.env
-    command: python src/main.py --ticker AAPL,MSFT,NVDA --ollama
+    command: python app/backend/cli_main.py --ticker AAPL,MSFT,NVDA --ollama
     environment:
       PYTHONUNBUFFERED: "1"
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
@@ -67,7 +67,7 @@ services:
     image: ai-hedge-fund
     volumes:
       - ../.env:/app/.env
-    command: python src/backtester.py --ticker AAPL,MSFT,NVDA
+    command: python app/backend/backtester.py --ticker AAPL,MSFT,NVDA
     environment:
       PYTHONUNBUFFERED: "1"
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
@@ -82,7 +82,7 @@ services:
     image: ai-hedge-fund
     volumes:
       - ../.env:/app/.env
-    command: python src/backtester.py --ticker AAPL,MSFT,NVDA --ollama
+    command: python app/backend/backtester.py --ticker AAPL,MSFT,NVDA --ollama
     environment:
       PYTHONUNBUFFERED: "1"
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}

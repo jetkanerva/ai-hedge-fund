@@ -255,12 +255,12 @@ fi
 
 # Set script path and parameters based on command
 if [ "$COMMAND" = "main" ]; then
-  SCRIPT_PATH="src/main.py"
+  SCRIPT_PATH="app/backend/cli_main.py"
   if [ "$COMMAND" = "main" ]; then
     INITIAL_PARAM="--initial-cash $INITIAL_AMOUNT"
   fi
 elif [ "$COMMAND" = "backtest" ]; then
-  SCRIPT_PATH="src/backtester.py"
+  SCRIPT_PATH="app/backend/backtester.py"
   if [ "$COMMAND" = "backtest" ]; then
     INITIAL_PARAM="--initial-capital $INITIAL_AMOUNT"
   fi
@@ -350,12 +350,12 @@ if [ -n "$USE_OLLAMA" ]; then
 
   if [ "$COMMAND" = "main" ]; then
     if [ -n "$SHOW_REASONING" ]; then
-      $COMPOSE_CMD $GPU_CONFIG run --rm hedge-fund-reasoning python src/main.py --ticker $TICKER $COMMAND_OVERRIDE $SHOW_REASONING --ollama
+      $COMPOSE_CMD $GPU_CONFIG run --rm hedge-fund-reasoning python app/backend/cli_main.py --ticker $TICKER $COMMAND_OVERRIDE $SHOW_REASONING --ollama
     else
-      $COMPOSE_CMD $GPU_CONFIG run --rm hedge-fund-ollama python src/main.py --ticker $TICKER $COMMAND_OVERRIDE --ollama
+      $COMPOSE_CMD $GPU_CONFIG run --rm hedge-fund-ollama python app/backend/cli_main.py --ticker $TICKER $COMMAND_OVERRIDE --ollama
     fi
   elif [ "$COMMAND" = "backtest" ]; then
-    $COMPOSE_CMD $GPU_CONFIG run --rm backtester-ollama python src/backtester.py --ticker $TICKER $COMMAND_OVERRIDE $SHOW_REASONING --ollama
+    $COMPOSE_CMD $GPU_CONFIG run --rm backtester-ollama python app/backend/backtester.py --ticker $TICKER $COMMAND_OVERRIDE $SHOW_REASONING --ollama
   fi
 
   exit 0
