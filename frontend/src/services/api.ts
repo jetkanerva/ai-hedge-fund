@@ -81,6 +81,32 @@ export const api = {
   },
 
   /**
+   * Uploads a file to the backend to be parsed by OpenAI
+   * @param file The file to upload
+   * @returns Promise that resolves to the parsed data (Portfolio or Stock input)
+   */
+  uploadFile: async (file: File): Promise<any> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await authFetch(`${API_BASE_URL}/hedge-fund/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to upload file:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Runs a hedge fund simulation with the given parameters and streams the results
    * @param params The hedge fund request parameters
    * @param nodeContext Node context for updating node states

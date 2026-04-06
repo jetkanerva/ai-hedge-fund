@@ -77,6 +77,18 @@ const baseNodeTypeDefinitions: Record<string, NodeTypeDefinition> = {
       },
     }),
   },
+  "File Input": {
+    createNode: (position: { x: number, y: number }): AppNode => ({
+      id: `file-input-node_${generateUniqueIdSuffix()}`,
+      type: "file-input-node",
+      position,
+      data: {
+        name: "File Input",
+        description: "Upload a file to automatically parse portfolio or stock inputs using OpenAI.",
+        status: "Idle",
+      },
+    }),
+  },
 };
 
 /**

@@ -1,7 +1,10 @@
-from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi import APIRouter, HTTPException, Request, Depends, UploadFile, File
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 import asyncio
+import json
+import base64
+from typing import Dict, Any
 
 from backend.database import get_db
 from backend.models.schemas import ErrorResponse, HedgeFundRequest, BacktestRequest, BacktestDayResult, BacktestPerformanceMetrics
@@ -12,8 +15,93 @@ from backend.services.backtest_service import BacktestService
 from backend.services.api_key_service import ApiKeyService
 from backend.utils.progress import progress
 from backend.utils.analysts import get_agents_list
+from backend.llm.models import get_model, ModelProvider
+from io import BytesIO
+from langchain_core.messages import HumanMessage
 
 router = APIRouter(prefix="/hedge-fund")
+
+@router.post(
+    path="/upload",
+    responses={
+        200: {"description": "Successfully parsed file"},
+        400: {"model": ErrorResponse, "description": "Invalid request parameters"},
+        500: {"model": ErrorResponse, "description": "Internal server error"},
+    },
+)
+async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Upload and parse a file using OpenAI."""
+    try:
+        content = await file.read()
+        file_ext = file.filename.split('.')[-1].lower() if '.' in file.filename else ''
+        
+        extracted_text = ""
+        image_data = None
+        
+        if file_ext in ['txt', 'csv', 'json', 'md']:
+            extracted_text = content.decode('utf-8', errors='ignore')
+        elif file_ext in ['pdf', 'png', 'jpg', 'jpeg', 'webp']:
+            image_data = base64.b64encode(content).decode('utf-8')
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported file format")
+
+        prompt = """
+        You are an expert financial assistant. Analyze the provided data and determine if it represents a list of stock tickers to analyze, or a portfolio with current positions.
+        
+        Output valid JSON exactly matching one of the two following formats, and do not output any other text:
+        
+        Format 1 (For just a list of stocks/tickers):
+        {
+            "type": "stock",
+            "tickers": ["AAPL", "MSFT", "TSLA"]
+        }
+        
+        Format 2 (For a portfolio with quantities and prices):
+        {
+            "type": "portfolio",
+            "positions": [
+                {"ticker": "AAPL", "quantity": "100", "tradePrice": "150.50"},
+                {"ticker": "MSFT", "quantity": "50", "tradePrice": "300.00"}
+            ]
+        }
+        
+        If the file has prices/quantities, use Format 2. Otherwise use Format 1. Convert all tickers to uppercase symbols.
+        """
+
+        messages = []
+        if extracted_text:
+            messages.append(HumanMessage(content=prompt + "\n\nData:\n" + extracted_text[:15000]))
+        elif image_data:
+            mime_type = "application/pdf" if file_ext == "pdf" else f"image/{file_ext}"
+            messages.append(HumanMessage(content=[
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:{mime_type};base64,{image_data}"}
+                }
+            ]))
+            
+        api_key_service = ApiKeyService(db)
+        api_keys = api_key_service.get_api_keys_dict()
+        
+        llm = get_model("gpt-5.4", ModelProvider.OPENAI, api_keys)
+        if not llm:
+            raise ValueError("Could not initialize OpenAI model")
+            
+        response = llm.invoke(messages)
+        
+        response_text = response.content.strip()
+        if response_text.startswith("```json"):
+            response_text = response_text[7:-3].strip()
+        elif response_text.startswith("```"):
+            response_text = response_text[3:-3].strip()
+            
+        result = json.loads(response_text)
+        return result
+
+    except Exception as e:
+        print(f"Error parsing file: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post(
     path="/run",

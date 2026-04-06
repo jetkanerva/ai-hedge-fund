@@ -103,7 +103,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/63/97/34c56b02987e0cf178246716987d0e142298b16cd393517b825c806c1b70/langgraph-0.2.56-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/f2/06bf5addf8ee664291e1b9ffa1f28fc9d97e59806dc7de5aea9844cbf335/langgraph_checkpoint-2.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/1a/3eacc4df8127781ee4b0b1e5cad7dbaf12510f58c42cbcb9d1e2dba2a164/langgraph_sdk-0.1.74-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/41/3c/a36c2450754618e62008bf7435ccb0f88053e07592e6028a34776213d877/markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
@@ -273,7 +273,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/63/97/34c56b02987e0cf178246716987d0e142298b16cd393517b825c806c1b70/langgraph-0.2.56-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/f2/06bf5addf8ee664291e1b9ffa1f28fc9d97e59806dc7de5aea9844cbf335/langgraph_checkpoint-2.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/1a/3eacc4df8127781ee4b0b1e5cad7dbaf12510f58c42cbcb9d1e2dba2a164/langgraph_sdk-0.1.74-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/33/8a/8e42d4838cd89b7dde187011e97fe6c3af66d8c044997d2183fbd6d31352/markupsafe-3.0.3-cp314-cp314-macosx_10_13_x86_64.whl
@@ -443,7 +443,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/63/97/34c56b02987e0cf178246716987d0e142298b16cd393517b825c806c1b70/langgraph-0.2.56-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/f2/06bf5addf8ee664291e1b9ffa1f28fc9d97e59806dc7de5aea9844cbf335/langgraph_checkpoint-2.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/1a/3eacc4df8127781ee4b0b1e5cad7dbaf12510f58c42cbcb9d1e2dba2a164/langgraph_sdk-0.1.74-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b5/64/7660f8a4a8e53c924d0fa05dc3a55c9cee10bbd82b11c5afb27d44b096ce/markupsafe-3.0.3-cp314-cp314-macosx_11_0_arm64.whl
@@ -615,7 +615,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/63/97/34c56b02987e0cf178246716987d0e142298b16cd393517b825c806c1b70/langgraph-0.2.56-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/f2/06bf5addf8ee664291e1b9ffa1f28fc9d97e59806dc7de5aea9844cbf335/langgraph_checkpoint-2.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/1a/3eacc4df8127781ee4b0b1e5cad7dbaf12510f58c42cbcb9d1e2dba2a164/langgraph_sdk-0.1.74-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/52/182836104b33b444e400b14f797212f720cbc9ed6ba34c800639d154e821/markupsafe-3.0.3-cp314-cp314-win_amd64.whl
@@ -804,7 +804,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/63/97/34c56b02987e0cf178246716987d0e142298b16cd393517b825c806c1b70/langgraph-0.2.56-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/f2/06bf5addf8ee664291e1b9ffa1f28fc9d97e59806dc7de5aea9844cbf335/langgraph_checkpoint-2.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/1a/3eacc4df8127781ee4b0b1e5cad7dbaf12510f58c42cbcb9d1e2dba2a164/langgraph_sdk-0.1.74-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/41/3c/a36c2450754618e62008bf7435ccb0f88053e07592e6028a34776213d877/markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
@@ -986,7 +986,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/63/97/34c56b02987e0cf178246716987d0e142298b16cd393517b825c806c1b70/langgraph-0.2.56-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/f2/06bf5addf8ee664291e1b9ffa1f28fc9d97e59806dc7de5aea9844cbf335/langgraph_checkpoint-2.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/1a/3eacc4df8127781ee4b0b1e5cad7dbaf12510f58c42cbcb9d1e2dba2a164/langgraph_sdk-0.1.74-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/33/8a/8e42d4838cd89b7dde187011e97fe6c3af66d8c044997d2183fbd6d31352/markupsafe-3.0.3-cp314-cp314-macosx_10_13_x86_64.whl
@@ -1168,7 +1168,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/63/97/34c56b02987e0cf178246716987d0e142298b16cd393517b825c806c1b70/langgraph-0.2.56-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/f2/06bf5addf8ee664291e1b9ffa1f28fc9d97e59806dc7de5aea9844cbf335/langgraph_checkpoint-2.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/1a/3eacc4df8127781ee4b0b1e5cad7dbaf12510f58c42cbcb9d1e2dba2a164/langgraph_sdk-0.1.74-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b5/64/7660f8a4a8e53c924d0fa05dc3a55c9cee10bbd82b11c5afb27d44b096ce/markupsafe-3.0.3-cp314-cp314-macosx_11_0_arm64.whl
@@ -1352,7 +1352,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/63/97/34c56b02987e0cf178246716987d0e142298b16cd393517b825c806c1b70/langgraph-0.2.56-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/f2/06bf5addf8ee664291e1b9ffa1f28fc9d97e59806dc7de5aea9844cbf335/langgraph_checkpoint-2.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/1a/3eacc4df8127781ee4b0b1e5cad7dbaf12510f58c42cbcb9d1e2dba2a164/langgraph_sdk-0.1.74-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/52/182836104b33b444e400b14f797212f720cbc9ed6ba34c800639d154e821/markupsafe-3.0.3-cp314-cp314-win_amd64.whl
@@ -1460,7 +1460,7 @@ packages:
 - pypi: ./
   name: ai-hedge-fund
   version: 1.0.0
-  sha256: 33d94faf2c809c2155361fdff663b4592f5b98ca6ee3213170a96d24b1b8f301
+  sha256: 53e9654b4f0864b902c39bf275dd9f0d0dbe8e4a54f1dda71400f7e8da096296
   requires_dist:
   - langchain>=0.3.7
   - langchain-anthropic==0.3.5
@@ -1493,7 +1493,7 @@ packages:
   - black>=23.7.0 ; extra == 'dev'
   - isort>=5.12.0 ; extra == 'dev'
   - flake8>=6.1.0 ; extra == 'dev'
-  requires_python: '>=3.11'
+  requires_python: '>=3.13,<3.14'
 - pypi: https://files.pythonhosted.org/packages/0f/15/5bf3b99495fb160b63f95972b81750f18f7f4e02ad051373b669d17d44f2/aiohappyeyeballs-2.6.1-py3-none-any.whl
   name: aiohappyeyeballs
   version: 2.6.1
@@ -3148,10 +3148,10 @@ packages:
   - httpx>=0.25.2
   - orjson>=3.10.1
   requires_python: '>=3.9'
-- pypi: https://files.pythonhosted.org/packages/29/13/67889d41baf7dbaf13ffd0b334a0f284e107fad1cc8782a1abb1e56e5eeb/langsmith-0.7.25-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/81/8e/7eb7d65ce62e98e74b9f18f193ea7ac3996d4fbd71fffcc67d0f7ba3103e/langsmith-0.7.26-py3-none-any.whl
   name: langsmith
-  version: 0.7.25
-  sha256: 55ecc24c547f6c79b5a684ff8685c669eec34e52fcac5d2c0af7d613aef5a632
+  version: 0.7.26
+  sha256: fe5c877972cea450c1c48251c8fae0f18543c8d19dfdb9ff9a9c4263763dde4e
   requires_dist:
   - httpx>=0.23.0,<1
   - orjson>=3.9.14 ; platform_python_implementation != 'PyPy'

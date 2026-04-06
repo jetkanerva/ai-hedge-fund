@@ -20,23 +20,24 @@ import { InvestmentReportContent } from '@/nodes/components/investment-report-co
 // Create a LayoutContent component to access the FlowContext, TabsContext, and LayoutContext
 function LayoutContent({ children }: { children?: ReactNode }) {
   const { currentFlowId, reactFlowInstance } = useFlowContext();
-  const { openTab } = useTabsContext();
+  const { openTab, tabs, activeTabId, updateTabMetadata } = useTabsContext();
   const { isBottomCollapsed, expandBottomPanel, collapseBottomPanel, toggleBottomPanel } = useLayoutContext();
   const { getOutputNodeDataForFlow } = useNodeContext();
   
+  const activeTab = tabs.find(tab => tab.id === activeTabId);
+  const showInvestmentReport = activeTab?.metadata?.showInvestmentReport || false;
+
   // Get output node data for the current flow to check for investment report
   const flowId = currentFlowId?.toString() || null;
   const outputNodeData = getOutputNodeDataForFlow(flowId);
   const hasInvestmentReport = !!(outputNodeData && outputNodeData.decisions && outputNodeData.decisions.backtest?.type !== 'backtest_complete');
   
-  const [showInvestmentReport, setShowInvestmentReport] = useState(false);
-
   // If report becomes unavailable, ensure we switch back
   useEffect(() => {
-    if (!hasInvestmentReport && showInvestmentReport) {
-      setShowInvestmentReport(false);
+    if (!hasInvestmentReport && showInvestmentReport && activeTabId) {
+      updateTabMetadata(activeTabId, { showInvestmentReport: false });
     }
-  }, [hasInvestmentReport, showInvestmentReport]);
+  }, [hasInvestmentReport, showInvestmentReport, activeTabId, updateTabMetadata]);
   
   // Initialize sidebar states from storage service
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(() => 
@@ -104,22 +105,21 @@ function LayoutContent({ children }: { children?: ReactNode }) {
         isLeftCollapsed={isLeftCollapsed}
         isRightCollapsed={isRightCollapsed}
         isBottomCollapsed={isBottomCollapsed}
-        hasInvestmentReport={hasInvestmentReport}
-        showInvestmentReport={showInvestmentReport}
         onToggleLeft={() => setIsLeftCollapsed(!isLeftCollapsed)}
         onToggleRight={() => setIsRightCollapsed(!isRightCollapsed)}
         onToggleBottom={toggleBottomPanel}
         onSettingsClick={handleSettingsClick}
-        onToggleInvestmentReport={setShowInvestmentReport}
       />
 
       {/* Tab Bar - positioned absolutely like bottom panel */}
       <div 
         className={cn(
-          "absolute top-0 z-10 transition-all duration-200",
-          showInvestmentReport && "opacity-0 pointer-events-none"
+          "absolute top-0 z-10 transition-all duration-200"
         )}
-        style={getSidebarBasedStyle()}
+        style={{
+          ...getSidebarBasedStyle(),
+          right: isRightCollapsed ? '260px' : `${Math.max(rightSidebarWidth, 260)}px`
+        }}
       >
         <TabBar />
       </div>

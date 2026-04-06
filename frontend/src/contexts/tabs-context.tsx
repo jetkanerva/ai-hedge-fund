@@ -36,6 +36,7 @@ interface TabsContextType {
   reorderTabs: (fromIndex: number, toIndex: number) => void;
   updateTabTitle: (tabId: string, newTitle: string) => void;
   updateFlowTabTitle: (flowId: number, newTitle: string) => void;
+  updateTabMetadata: (tabId: string, metadata: Record<string, any>) => void;
 }
 
 const TabsContext = createContext<TabsContextType | null>(null);
@@ -249,6 +250,13 @@ export function TabsProvider({ children }: TabsProviderProps) {
     });
   }, []);
 
+  // Update tab metadata
+  const updateTabMetadata = useCallback((tabId: string, metadata: Record<string, any>) => {
+    setTabs(prevTabs => prevTabs.map(tab => 
+      tab.id === tabId ? { ...tab, metadata: { ...tab.metadata, ...metadata } } : tab
+    ));
+  }, []);
+
   const value = {
     tabs,
     activeTabId,
@@ -261,6 +269,7 @@ export function TabsProvider({ children }: TabsProviderProps) {
     reorderTabs,
     updateTabTitle,
     updateFlowTabTitle,
+    updateTabMetadata,
   };
 
   return (

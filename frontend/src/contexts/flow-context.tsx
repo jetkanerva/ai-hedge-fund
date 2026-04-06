@@ -39,7 +39,7 @@ export function FlowProvider({ children }: FlowProviderProps) {
   const [isUnsaved, setIsUnsaved] = useState(false);
 
   // Calculate viewport center position with optional randomness
-  const getViewportPosition = useCallback((addRandomness = false): XYPosition => {
+  const getViewportPosition = useCallback((addRandomness: boolean = false): XYPosition => {
     let position: XYPosition = { x: 100, y: 100 }; // Default position, slightly offset from 0,0
     
     try {
@@ -72,11 +72,6 @@ export function FlowProvider({ children }: FlowProviderProps) {
     
     return position;
   }, [reactFlowInstance]);
-
-  // Mark flow as unsaved when changes are made
-  const markAsUnsaved = useCallback(() => {
-    setIsUnsaved(true);
-  }, []);
 
   // Save current flow
   const saveCurrentFlow = useCallback(async (name?: string, description?: string, overrideNodes?: any[], overrideEdges?: any[]): Promise<Flow | null> => {

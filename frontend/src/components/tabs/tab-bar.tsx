@@ -1,4 +1,7 @@
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { useFlowContext } from '@/contexts/flow-context';
+import { useNodeContext } from '@/contexts/node-context';
 import { useTabsContext } from '@/contexts/tabs-context';
 import { cn } from '@/lib/utils';
 import { FileText, Layout, Settings, X } from 'lucide-react';
@@ -21,9 +24,25 @@ const getTabIcon = (type: string): ReactNode => {
 };
 
 export function TabBar({ className }: TabBarProps) {
-  const { tabs, activeTabId, setActiveTab, closeTab, reorderTabs } = useTabsContext();
+  const { tabs, activeTabId, setActiveTab, closeTab, reorderTabs, updateTabMetadata } = useTabsContext();
+  const { currentFlowId } = useFlowContext();
+  const { getOutputNodeDataForFlow } = useNodeContext();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  // Check for investment report availability
+  const flowId = currentFlowId?.toString() || null;
+  const outputNodeData = getOutputNodeDataForFlow(flowId);
+  const hasInvestmentReport = !!(outputNodeData && outputNodeData.decisions && outputNodeData.decisions.backtest?.type !== 'backtest_complete');
+
+  const activeTab = tabs.find(tab => tab.id === activeTabId);
+  const showInvestmentReport = activeTab?.metadata?.showInvestmentReport || false;
+
+  const handleToggleInvestmentReport = (checked: boolean) => {
+    if (activeTabId) {
+      updateTabMetadata(activeTabId, { showInvestmentReport: checked });
+    }
+  };
 
   if (tabs.length === 0) {
     return null;
@@ -66,10 +85,10 @@ export function TabBar({ className }: TabBarProps) {
 
   return (
     <div className={cn(
-      "flex items-center bg-panel border-b overflow-x-auto",
+      "flex items-center bg-panel border-b",
       className
     )}>
-      <div className="flex items-center min-w-0">
+      <div className="flex items-center min-w-0 overflow-x-auto flex-1">
         {tabs.map((tab, index) => (
           <div
             key={tab.id}
@@ -166,6 +185,19 @@ export function TabBar({ className }: TabBarProps) {
           </div>
         ))}
       </div>
+
+      {/* Investment Report Toggle */}
+      {activeTab?.type === 'flow' && hasInvestmentReport && (
+        <div className="flex items-center gap-2 px-4 py-1.5 border-l border-border flex-shrink-0 bg-panel z-10">
+          <FileText size={14} className="text-muted-foreground" />
+          <span className="text-xs font-medium text-muted-foreground">Report</span>
+          <Switch 
+            checked={showInvestmentReport} 
+            onCheckedChange={handleToggleInvestmentReport} 
+            className="scale-75 data-[state=checked]:bg-primary"
+          />
+        </div>
+      )}
     </div>
   );
 } 

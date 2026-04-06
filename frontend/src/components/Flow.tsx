@@ -57,7 +57,7 @@ export function Flow({ className = '' }: FlowProps) {
   const { takeSnapshot, undo, redo } = useFlowHistory({ flowId: currentFlowId });
 
   // Create debounced auto-save function
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedFlowIdRef = useRef<number | null>(null);
   
   const autoSave = useCallback(async (flowIdToSave?: number | null) => {

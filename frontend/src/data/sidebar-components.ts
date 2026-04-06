@@ -1,14 +1,11 @@
 import {
-  BadgeDollarSign,
   Bot,
   Brain,
-  Calculator,
   ChartLine,
   ChartPie,
   LucideIcon,
-  Network,
   Play,
-  Zap
+  FileText
 } from 'lucide-react';
 import { Agent, getAgents } from './agents';
 
@@ -39,6 +36,7 @@ export const getComponentGroups = async (): Promise<ComponentGroup[]> => {
       items: [
         { name: "Portfolio Input", icon: ChartPie },
         { name: "Stock Input", icon: ChartLine },
+        { name: "File Input", icon: FileText },
       ]
     },
     {
@@ -49,16 +47,6 @@ export const getComponentGroups = async (): Promise<ComponentGroup[]> => {
         name: agent.display_name,
         icon: Bot
       }))
-    },
-    {
-      name: "Swarms",
-      icon: Network,
-      iconColor: "text-yellow-500",
-      items: [
-        { name: "Data Wizards", icon: Calculator },
-        { name: "Market Mavericks", icon: Zap },
-        { name: "Value Investors", icon: BadgeDollarSign },
-      ]
     },
     {
       name: "End Nodes",
