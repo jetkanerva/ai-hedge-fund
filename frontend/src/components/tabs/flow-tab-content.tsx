@@ -1,5 +1,6 @@
 import { Flow } from '@/components/Flow';
 import { useFlowContext } from '@/contexts/flow-context';
+import { useNodeContext } from '@/contexts/node-context';
 import { useTabsContext } from '@/contexts/tabs-context';
 import { setNodeInternalState, setCurrentFlowId as setNodeStateFlowId } from '@/hooks/use-node-state';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,7 @@ interface FlowTabContentProps {
 export function FlowTabContent({ flow, className }: FlowTabContentProps) {
   const { loadFlow } = useFlowContext();
   const { activeTabId } = useTabsContext();
+  const { importNodeContextData } = useNodeContext();
 
   // Enhanced load function that restores both use-node-state and node context data
   const loadFlowWithCompleteState = async (flowToLoad: FlowType) => {
@@ -43,9 +45,16 @@ export function FlowTabContent({ flow, className }: FlowTabContentProps) {
         });
       }
       
-      // NOTE: We intentionally do NOT restore nodeContextData here
+      // NOTE: We intentionally do NOT restore agentNodeData here
       // Runtime execution data (messages, analysis, agent status) should start fresh
       // Only configuration data (tickers, model selections) is restored above
+      
+      // However, we DO want to restore outputNodeData so that reports persist across refreshes
+      if (flowToLoad.data?.nodeContextData?.outputNodeData) {
+        importNodeContextData(flowId, {
+          outputNodeData: flowToLoad.data.nodeContextData.outputNodeData
+        });
+      }
     } catch (error) {
       console.error('Failed to load flow with complete state:', error);
       throw error;

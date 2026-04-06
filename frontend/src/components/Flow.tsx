@@ -22,6 +22,7 @@ import '@xyflow/react/dist/style.css';
 import { useFlowContext } from '@/contexts/flow-context';
 import { useEnhancedFlowActions } from '@/hooks/use-enhanced-flow-actions';
 import { useFlowHistory } from '@/hooks/use-flow-history';
+import { useFlowConnectionState } from '@/hooks/use-flow-connection';
 import { useFlowKeyboardShortcuts, useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useToastManager } from '@/hooks/use-toast-manager';
 import { AppNode } from '@/nodes/types';
@@ -209,6 +210,15 @@ export function Flow({ className = '' }: FlowProps) {
       error('Failed to save flow', 'flow-save-error');
     }
   });
+
+  // Automatically save flow when connection state becomes 'completed'
+  const connectionState = useFlowConnectionState(currentFlowId ? currentFlowId.toString() : null);
+  useEffect(() => {
+    if (connectionState?.state === 'completed') {
+      // Auto-save the flow state including output data when processing finishes
+      autoSave();
+    }
+  }, [connectionState?.state, autoSave]);
 
   // Add undo/redo keyboard shortcuts
   useKeyboardShortcuts({

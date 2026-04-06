@@ -190,6 +190,10 @@ def analyze_fisher_growth_quality(financial_line_items: list) -> dict:
         if oldest_rev > 0 and latest_rev > 0:
             # CAGR formula: (ending_value/beginning_value)^(1/years) - 1
             rev_growth = (latest_rev / oldest_rev) ** (1 / num_years) - 1
+        elif oldest_rev > 0 and latest_rev <= 0:
+            rev_growth = (latest_rev - oldest_rev) / (oldest_rev * num_years)
+            
+        if 'rev_growth' in locals():
             if rev_growth > 0.20:  # 20% annualized
                 raw_score += 3
                 details.append(f"Very strong annualized revenue growth: {rev_growth:.1%}")
@@ -215,6 +219,10 @@ def analyze_fisher_growth_quality(financial_line_items: list) -> dict:
         if oldest_eps > 0 and latest_eps > 0:
             # CAGR formula for EPS
             eps_growth = (latest_eps / oldest_eps) ** (1 / num_years) - 1
+        elif oldest_eps > 0 and latest_eps <= 0:
+            eps_growth = (latest_eps - oldest_eps) / (oldest_eps * num_years)
+            
+        if 'eps_growth' in locals():
             if eps_growth > 0.20:  # 20% annualized
                 raw_score += 3
                 details.append(f"Very strong annualized EPS growth: {eps_growth:.1%}")

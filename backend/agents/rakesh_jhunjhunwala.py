@@ -223,7 +223,10 @@ def analyze_profitability(financial_line_items: list) -> dict[str, any]:
         years = len(eps_values) - 1
         
         if initial_eps > 0:
-            eps_cagr = ((final_eps / initial_eps) ** (1/years) - 1) * 100
+            if final_eps > 0:
+                eps_cagr = ((final_eps / initial_eps) ** (1/years) - 1) * 100
+            else:
+                eps_cagr = ((final_eps - initial_eps) / (initial_eps * years)) * 100
             if eps_cagr > 20:  # High growth
                 score += 3
                 reasoning.append(f"High EPS CAGR: {eps_cagr:.1f}%")
@@ -264,7 +267,10 @@ def analyze_growth(financial_line_items: list) -> dict[str, any]:
         years = len(revenues) - 1
         
         if initial_revenue > 0:  # Fixed: Add zero check
-            revenue_cagr = ((final_revenue / initial_revenue) ** (1/years) - 1) * 100
+            if final_revenue > 0:
+                revenue_cagr = ((final_revenue / initial_revenue) ** (1/years) - 1) * 100
+            else:
+                revenue_cagr = ((final_revenue - initial_revenue) / (initial_revenue * years)) * 100
             
             if revenue_cagr > 20:  # High growth
                 score += 3
@@ -292,7 +298,10 @@ def analyze_growth(financial_line_items: list) -> dict[str, any]:
         years = len(net_incomes) - 1
         
         if initial_income > 0:  # Fixed: Add zero check
-            income_cagr = ((final_income / initial_income) ** (1/years) - 1) * 100
+            if final_income > 0:
+                income_cagr = ((final_income / initial_income) ** (1/years) - 1) * 100
+            else:
+                income_cagr = ((final_income - initial_income) / (initial_income * years)) * 100
             
             if income_cagr > 25:  # Very high growth
                 score += 3
@@ -527,7 +536,10 @@ def calculate_intrinsic_value(financial_line_items: list, market_cap: float) -> 
         
         # Calculate historical CAGR
         if initial_income > 0:  # Fixed: Add zero check
-            historical_growth = ((final_income / initial_income) ** (1/years) - 1)
+            if final_income > 0:
+                historical_growth = ((final_income / initial_income) ** (1/years) - 1)
+            else:
+                historical_growth = (final_income - initial_income) / (initial_income * years)
         else:
             historical_growth = 0.05  # Default to 5%
         

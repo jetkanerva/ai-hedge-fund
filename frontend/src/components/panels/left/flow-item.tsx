@@ -1,6 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { useFlowConnectionState } from '@/hooks/use-flow-connection';
+import { useNodeContext } from '@/contexts/node-context';
+import { useTabsContext } from '@/contexts/tabs-context';
 import { cn } from '@/lib/utils';
 import { flowService } from '@/services/flow-service';
 import { Flow } from '@/types/flow';
@@ -29,6 +32,32 @@ export default function FlowItem({ flow, onLoadFlow, onDeleteFlow, onRefresh, is
     position: { x: 0, y: 0 }
   });
   const [editDialog, setEditDialog] = useState(false);
+
+  const { getOutputNodeDataForFlow } = useNodeContext();
+  const { tabs, activeTabId, updateTabMetadata } = useTabsContext();
+
+  // Check for investment report availability
+  const contextOutputNodeData = getOutputNodeDataForFlow(flow.id.toString());
+  // Use context data if available (active/loaded flow), otherwise fall back to saved data in flow object
+  const outputNodeData = contextOutputNodeData || (flow.data as any)?.nodeContextData?.outputNodeData;
+  const hasInvestmentReport = !!(outputNodeData && outputNodeData.decisions && outputNodeData.decisions.backtest?.type !== 'backtest_complete');
+
+  const tabId = `flow-${flow.id}`;
+  const tab = tabs.find(t => t.id === tabId);
+  const showInvestmentReport = tab?.metadata?.showInvestmentReport || false;
+
+  const handleToggleInvestmentReport = async (checked: boolean) => {
+    if (checked) {
+      if (activeTabId !== tabId) {
+        await onLoadFlow(flow);
+      }
+      updateTabMetadata(tabId, { showInvestmentReport: true });
+    } else {
+      if (tab) {
+        updateTabMetadata(tabId, { showInvestmentReport: false });
+      }
+    }
+  };
 
   // Check if this flow has an active connection
   const connectionState = useFlowConnectionState(flow.id.toString());
@@ -168,7 +197,23 @@ export default function FlowItem({ flow, onLoadFlow, onDeleteFlow, onRefresh, is
           )}
         </div>
         
-        <div className="flex items-center">
+        <div className="flex items-center gap-1">
+          {/* Investment Report Toggle */}
+          {hasInvestmentReport && (
+            <div 
+              className="flex items-center gap-1 bg-ramp-grey-800/50 px-1.5 py-1 rounded border border-border"
+              onClick={(e) => e.stopPropagation()} // prevent row click
+            >
+              <FileText size={12} className="text-muted-foreground" />
+              <span className="text-[10px] font-medium text-muted-foreground hidden xl:inline-block">Report</span>
+              <Switch 
+                checked={showInvestmentReport} 
+                onCheckedChange={handleToggleInvestmentReport} 
+                className="scale-50 data-[state=checked]:bg-primary"
+              />
+            </div>
+          )}
+
           <Button
             variant="ghost"
             size="icon"

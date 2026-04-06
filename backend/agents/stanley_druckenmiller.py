@@ -187,6 +187,10 @@ def analyze_growth_and_momentum(financial_line_items: list, prices: list) -> dic
         if older_rev > 0 and latest_rev > 0:
             # CAGR formula: (ending_value/beginning_value)^(1/years) - 1
             rev_growth = (latest_rev / older_rev) ** (1 / num_years) - 1
+        elif older_rev > 0 and latest_rev <= 0:
+            rev_growth = (latest_rev - older_rev) / (older_rev * num_years)
+        
+        if 'rev_growth' in locals():
             if rev_growth > 0.08:  # 8% annualized (adjusted for CAGR)
                 raw_score += 3
                 details.append(f"Strong annualized revenue growth: {rev_growth:.1%}")
@@ -215,6 +219,10 @@ def analyze_growth_and_momentum(financial_line_items: list, prices: list) -> dic
         if older_eps > 0 and latest_eps > 0:
             # CAGR formula for EPS
             eps_growth = (latest_eps / older_eps) ** (1 / num_years) - 1
+        elif older_eps > 0 and latest_eps <= 0:
+            eps_growth = (latest_eps - older_eps) / (older_eps * num_years)
+        
+        if 'eps_growth' in locals():
             if eps_growth > 0.08:  # 8% annualized (adjusted for CAGR)
                 raw_score += 3
                 details.append(f"Strong annualized EPS growth: {eps_growth:.1%}")

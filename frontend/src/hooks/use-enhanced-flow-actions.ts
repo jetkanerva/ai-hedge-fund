@@ -15,7 +15,7 @@ import { useCallback } from 'react';
  */
 export function useEnhancedFlowActions() {
   const { saveCurrentFlow, loadFlow, reactFlowInstance, currentFlowId } = useFlowContext();
-  const { exportNodeContextData } = useNodeContext();
+  const { exportNodeContextData, importNodeContextData } = useNodeContext();
 
   // Enhanced save that includes node context data
   const saveCurrentFlowWithCompleteState = useCallback(async (name?: string, description?: string): Promise<Flow | null> => {
@@ -101,16 +101,23 @@ export function useEnhancedFlowActions() {
         });
       }
       
-      // NOTE: We intentionally do NOT restore nodeContextData here
+      // NOTE: We intentionally do NOT restore agentNodeData here
       // Runtime execution data (messages, analysis, agent status) should start fresh
       // Only configuration data (tickers, model selections) is restored above
+      
+      // However, we DO want to restore outputNodeData so that reports persist across refreshes
+      if (flow.data?.nodeContextData?.outputNodeData) {
+        importNodeContextData(flow.id.toString(), {
+          outputNodeData: flow.data.nodeContextData.outputNodeData
+        });
+      }
 
       console.log('Flow loaded with complete state restoration:', flow.name);
     } catch (error) {
       console.error('Failed to load flow with complete state:', error);
       throw error;
     }
-  }, [loadFlow]);
+  }, [loadFlow, importNodeContextData]);
 
   return {
     saveCurrentFlowWithCompleteState,

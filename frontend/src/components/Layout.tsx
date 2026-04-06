@@ -29,7 +29,9 @@ function LayoutContent({ children }: { children?: ReactNode }) {
 
   // Get output node data for the current flow to check for investment report
   const flowId = currentFlowId?.toString() || null;
-  const outputNodeData = getOutputNodeDataForFlow(flowId);
+  const contextOutputNodeData = getOutputNodeDataForFlow(flowId);
+  // Fallback to flow data if context is not yet populated (e.g. on page refresh)
+  const outputNodeData = contextOutputNodeData || (activeTab?.flow?.data as any)?.nodeContextData?.outputNodeData;
   const hasInvestmentReport = !!(outputNodeData && outputNodeData.decisions && outputNodeData.decisions.backtest?.type !== 'backtest_complete');
   
   // If report becomes unavailable, ensure we switch back
