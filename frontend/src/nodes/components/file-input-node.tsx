@@ -26,7 +26,7 @@ import { useFlowConnection } from '@/hooks/use-flow-connection';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useNodeState } from '@/hooks/use-node-state';
 import { cn, formatKeyboardShortcut } from '@/lib/utils';
-import { type AppNode } from '../types';
+import { type FileInputNode as FileInputNodeType } from '../types';
 import { NodeShell } from './node-shell';
 import { api } from '@/services/api';
 import { ModelProvider } from '@/services/types';
@@ -49,7 +49,7 @@ export function FileInputNode({
   selected,
   id,
   isConnectable,
-}: NodeProps<AppNode>) {
+}: NodeProps<FileInputNodeType>) {
   // Calculate default dates
   const today = new Date();
   const threeMonthsAgo = new Date(today);
@@ -164,10 +164,8 @@ export function FileInputNode({
   };
 
   const handlePlay = () => {
-    if (runMode === 'backtest') {
-      expandBottomPanel();
-      setBottomPanelTab('output');
-    }
+    expandBottomPanel();
+    setBottomPanelTab('output');
     
     const allNodes = getNodes();
     const allEdges = getEdges();
@@ -251,8 +249,8 @@ export function FileInputNode({
         agent_models: agentModels,
         model_name: undefined,
         model_provider: undefined,
-        start_date: runMode === 'single' ? startDate : threeMonthsAgo.toISOString().split('T')[0],
-        end_date: runMode === 'single' ? endDate : today.toISOString().split('T')[0],
+        start_date: startDate,
+        end_date: endDate,
         initial_cash: parseFloat(initialCash) || 100000,
         portfolio_positions: processedPositions,
       });
@@ -268,9 +266,10 @@ export function FileInputNode({
         selected={selected}
         isConnectable={isConnectable}
         icon={<FileText className="h-5 w-5" />}
-        name={(data as any)?.name || "File Input"}
-        description={(data as any)?.description}
+        name={data?.name || "File Input"}
+        description={data?.description}
         hasLeftHandle={false}
+        hasRightHandle={true}
         width="w-80"
       >
         <CardContent className="p-0">
