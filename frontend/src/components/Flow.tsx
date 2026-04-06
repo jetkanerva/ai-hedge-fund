@@ -37,13 +37,32 @@ export function Flow({ className = '' }: FlowProps) {
   // Use the resolved theme for ReactFlow ColorMode
   const colorMode: ColorMode = resolvedTheme === 'light' ? 'light' : 'dark';
   
-  const [nodes, , onNodesChange] = useNodesState<AppNode>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const proOptions = { hideAttribution: true };
   
   // Get flow context for flow ID
-  const { currentFlowId } = useFlowContext();
+  const { currentFlowId, reactFlowInstance } = useFlowContext();
+
+  // Keep nodes synced with reactFlowInstance
+  useEffect(() => {
+    if (reactFlowInstance) {
+      const storeNodes = reactFlowInstance.getNodes();
+      if (storeNodes.length > 0 && nodes.length === 0) {
+        setNodes(storeNodes);
+      }
+    }
+  }, [reactFlowInstance, nodes.length, setNodes]);
+
+  useEffect(() => {
+    if (reactFlowInstance) {
+      const storeEdges = reactFlowInstance.getEdges();
+      if (storeEdges.length > 0 && edges.length === 0) {
+        setEdges(storeEdges);
+      }
+    }
+  }, [reactFlowInstance, edges.length, setEdges]);
   
   // Get enhanced flow actions for complete state persistence
   const { saveCurrentFlowWithCompleteState } = useEnhancedFlowActions();
@@ -298,6 +317,7 @@ export function Flow({ className = '' }: FlowProps) {
           onInit={onInit}
           colorMode={colorMode}
           proOptions={proOptions}
+          deleteKeyCode={['Backspace', 'Delete']}
         >
           <Background 
             variant={BackgroundVariant.Dots}
