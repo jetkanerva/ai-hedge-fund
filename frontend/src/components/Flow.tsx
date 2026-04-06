@@ -9,8 +9,11 @@ import {
   NodeChange,
   ReactFlow,
   addEdge,
-  useEdgesState,
-  useNodesState
+  useReactFlow,
+  useNodes,
+  useEdges,
+  applyNodeChanges,
+  applyEdgeChanges
 } from '@xyflow/react';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -37,32 +40,14 @@ export function Flow({ className = '' }: FlowProps) {
   // Use the resolved theme for ReactFlow ColorMode
   const colorMode: ColorMode = resolvedTheme === 'light' ? 'light' : 'dark';
   
-  const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const { setNodes, setEdges } = useReactFlow<AppNode, Edge>();
+  const nodes = useNodes<AppNode>();
+  const edges = useEdges<Edge>();
   const [isInitialized, setIsInitialized] = useState(false);
   const proOptions = { hideAttribution: true };
   
   // Get flow context for flow ID
-  const { currentFlowId, reactFlowInstance } = useFlowContext();
-
-  // Keep nodes synced with reactFlowInstance
-  useEffect(() => {
-    if (reactFlowInstance) {
-      const storeNodes = reactFlowInstance.getNodes();
-      if (storeNodes.length > 0 && nodes.length === 0) {
-        setNodes(storeNodes);
-      }
-    }
-  }, [reactFlowInstance, nodes.length, setNodes]);
-
-  useEffect(() => {
-    if (reactFlowInstance) {
-      const storeEdges = reactFlowInstance.getEdges();
-      if (storeEdges.length > 0 && edges.length === 0) {
-        setEdges(storeEdges);
-      }
-    }
-  }, [reactFlowInstance, edges.length, setEdges]);
+  const { currentFlowId } = useFlowContext();
   
   // Get enhanced flow actions for complete state persistence
   const { saveCurrentFlowWithCompleteState } = useEnhancedFlowActions();
@@ -110,7 +95,7 @@ export function Flow({ className = '' }: FlowProps) {
   // Enhanced onNodesChange handler with auto-save for specific change types
   const handleNodesChange = useCallback((changes: NodeChange<AppNode>[]) => {
     // Apply the changes first
-    onNodesChange(changes);
+    setNodes((nds) => applyNodeChanges(changes, nds) as AppNode[]);
     
     // Check if any of the changes should trigger auto-save
     const shouldAutoSave = changes.some(change => {
@@ -136,12 +121,12 @@ export function Flow({ className = '' }: FlowProps) {
       const flowIdAtTimeOfChange = currentFlowId;
       autoSave(flowIdAtTimeOfChange);
     }
-  }, [onNodesChange, autoSave, isInitialized, currentFlowId]);
+  }, [setNodes, autoSave, isInitialized, currentFlowId]);
 
   // Enhanced onEdgesChange handler with auto-save for edge removal
   const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
     // Apply the changes first
-    onEdgesChange(changes);
+    setEdges((eds) => applyEdgeChanges(changes, eds));
     
     // Check if any of the changes should trigger auto-save
     const shouldAutoSave = changes.some(change => {
@@ -159,7 +144,7 @@ export function Flow({ className = '' }: FlowProps) {
       const flowIdAtTimeOfChange = currentFlowId;
       autoSave(flowIdAtTimeOfChange);
     }
-  }, [onEdgesChange, autoSave, isInitialized, currentFlowId]);
+  }, [setEdges, autoSave, isInitialized, currentFlowId]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
