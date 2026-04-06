@@ -196,10 +196,21 @@ def _analyze_value(metrics, line_items, market_cap):
     else:
         details.append("FCF data unavailable")
 
-    # EV/EBIT (from financial metrics)
-    if metrics:
-        ev_ebit = getattr(metrics[0], "ev_to_ebit", None)
-        if ev_ebit is not None:
+    # EV/EBIT calculation
+    latest_item = _latest_line_item(line_items)
+    if latest_item and market_cap:
+        # Calculate EV
+        total_debt = getattr(latest_item, "total_debt", 0) or 0
+        cash = getattr(latest_item, "cash_and_equivalents", 0) or 0
+        ev = market_cap + total_debt - cash
+        
+        # Calculate EBIT (fallback to operating income if missing)
+        ebit = getattr(latest_item, "ebit", None)
+        if ebit is None:
+            ebit = getattr(latest_item, "operating_income", None)
+            
+        if ev > 0 and ebit and ebit > 0:
+            ev_ebit = ev / ebit
             if ev_ebit < 6:
                 score += 2
                 details.append(f"EV/EBIT {ev_ebit:.1f} (<6)")

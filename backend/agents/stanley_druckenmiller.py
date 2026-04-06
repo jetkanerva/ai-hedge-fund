@@ -448,8 +448,28 @@ def analyze_druckenmiller_valuation(financial_line_items: list, market_cap: floa
     # Gather needed data
     net_incomes = [fi.net_income for fi in financial_line_items if fi.net_income is not None]
     fcf_values = [fi.free_cash_flow for fi in financial_line_items if fi.free_cash_flow is not None]
-    ebit_values = [fi.ebit for fi in financial_line_items if fi.ebit is not None]
-    ebitda_values = [fi.ebitda for fi in financial_line_items if fi.ebitda is not None]
+    
+    # EBIT and EBITDA with fallbacks to operating income if missing
+    ebit_values = []
+    ebitda_values = []
+    for fi in financial_line_items:
+        # Fallback for EBIT
+        ebit = getattr(fi, "ebit", None)
+        if ebit is None:
+            ebit = getattr(fi, "operating_income", None)
+        if ebit is not None:
+            ebit_values.append(ebit)
+            
+        # Fallback for EBITDA
+        ebitda = getattr(fi, "ebitda", None)
+        if ebitda is None:
+            op_inc = getattr(fi, "operating_income", 0) or 0
+            dep_amort = getattr(fi, "depreciation_and_amortization", 0) or 0
+            # If operating income is present, we can approximate EBITDA
+            if getattr(fi, "operating_income", None) is not None:
+                ebitda = op_inc + dep_amort
+        if ebitda is not None:
+            ebitda_values.append(ebitda)
 
     # For EV calculation, let's get the most recent total_debt & cash
     debt_values = [fi.total_debt for fi in financial_line_items if fi.total_debt is not None]

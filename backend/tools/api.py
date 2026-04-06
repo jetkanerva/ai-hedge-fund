@@ -378,6 +378,19 @@ def search_line_items(
         intangible = flat_data.get('intangibleAssets') or 0
         flat_data['goodwill_and_intangible_assets'] = goodwill + intangible
         
+        # Compute ebit if missing
+        if 'ebit' not in flat_data or flat_data['ebit'] is None:
+            op_inc = flat_data.get('operatingIncome')
+            if op_inc is not None:
+                flat_data['ebit'] = op_inc
+
+        # Compute ebitda if missing
+        if 'ebitda' not in flat_data or flat_data['ebitda'] is None:
+            ebit_val = flat_data.get('ebit')
+            dep_amort = flat_data.get('depreciation') or flat_data.get('depreciationAndAmortization') or 0
+            if ebit_val is not None:
+                flat_data['ebitda'] = ebit_val + dep_amort
+        
         ebit = flat_data.get('ebit')
         tax = flat_data.get('incomeTaxExpense')
         if ebit is not None and tax is not None and debt is not None and equity is not None:

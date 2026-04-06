@@ -2,8 +2,10 @@
 .git
 .gitignore
 
-# Poetry
+# Virtual Environments
 .venv
+venv/
+env/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -11,6 +13,7 @@ __pycache__/
 
 # Environment
 .env
+.env.local
 
 # IDEs and editors
 .idea/
@@ -25,4 +28,4 @@ data/
 
 # OS specific
 .DS_Store
-Thumbs.db 
+Thumbs.db
