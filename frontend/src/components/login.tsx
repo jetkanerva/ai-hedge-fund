@@ -27,7 +27,7 @@ export function Login() {
           <CardDescription>Sign in to access your portfolio and agents</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {user && user.email !== "jeti.kanerva@gmail.com" ? (
+          {user ? (
             <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive text-center">
               Your email ({user.email}) is not authorized to access this application.
               <br />

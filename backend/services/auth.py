@@ -30,7 +30,11 @@ async def verify_user(credentials: HTTPAuthorizationCredentials = Depends(securi
             raise Exception("No user returned")
             
         email = user.email
-        if email != "jeti.kanerva@gmail.com":
+        
+        allowed_emails_env = os.getenv("ALLOWED_EMAILS")
+        allowed_emails = [e.strip() for e in allowed_emails_env.split(",") if e.strip()]
+
+        if email not in allowed_emails:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not authorized. Your email does not have access.",

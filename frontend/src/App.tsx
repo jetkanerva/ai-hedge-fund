@@ -10,7 +10,7 @@ export default function App() {
     return <div className="flex h-screen w-full items-center justify-center bg-background">Loading...</div>;
   }
 
-  if (!user || user.email !== "jeti.kanerva@gmail.com") {
+  if (!user) {
     return <Login />;
   }
 
