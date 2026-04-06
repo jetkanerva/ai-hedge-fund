@@ -54,7 +54,6 @@ export function PortfolioStartNode({
   const [positions, setPositions] = useNodeState<PortfolioPosition[]>(id, 'positions', [
     { ticker: '', quantity: '', tradePrice: '' },
   ]);
-  const [initialCash, setInitialCash] = useNodeState(id, 'initialCash', '100000');
   const [runMode, setRunMode] = useNodeState(id, 'runMode', 'single');
   const [startDate, setStartDate] = useNodeState(id, 'startDate', threeMonthsAgo.toISOString().split('T')[0]);
   const [endDate, setEndDate] = useNodeState(id, 'endDate', today.toISOString().split('T')[0]);
@@ -119,10 +118,6 @@ export function PortfolioStartNode({
   const removePosition = (index: number) => {
     const newPositions = positions.filter((_, i) => i !== index);
     setPositions(newPositions);
-  };
-
-  const handleInitialCashChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInitialCash(e.target.value);
   };
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,7 +218,7 @@ export function PortfolioStartNode({
         agent_models: agentModels,
         start_date: startDate,
         end_date: endDate,
-        initial_capital: parseFloat(initialCash) || 100000,
+        initial_capital: 100000,
         margin_requirement: 0.0, // Default margin requirement
         model_name: undefined,
         model_provider: undefined,
@@ -248,7 +243,7 @@ export function PortfolioStartNode({
         model_provider: undefined,
         start_date: threeMonthsAgo.toISOString().split('T')[0],
         end_date: today.toISOString().split('T')[0],
-        initial_cash: parseFloat(initialCash) || 100000,
+        initial_cash: 100000,
         // Pass portfolio positions to backend
         portfolio_positions: portfolioPositions,
       });
@@ -273,25 +268,6 @@ export function PortfolioStartNode({
         <CardContent className="p-0">
           <div className="border-t border-border p-3">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="text-subtitle text-primary flex items-center gap-1">
-                  Available Cash
-                </div>
-                <div className="relative flex-1">
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none">
-                    $
-                  </div>
-                  <Input
-                    type="number"
-                    placeholder="100000"
-                    value={initialCash}
-                    onChange={handleInitialCashChange}
-                    className="pl-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    step="0.01"
-                    min="0"
-                  />
-                </div>
-              </div>
               <div className="flex flex-col gap-2">
                 <div className="text-subtitle text-primary flex items-center gap-1">
                   <Tooltip delayDuration={200}>

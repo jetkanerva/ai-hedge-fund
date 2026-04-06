@@ -1,5 +1,5 @@
 import { useReactFlow, type NodeProps } from '@xyflow/react';
-import { ChevronDown, FileText, Play, Square, Upload, CheckCircle2, Loader2 } from 'lucide-react';
+import { ChevronDown, FileText, Play, Square, Upload, CheckCircle2, Loader2, X, Plus } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useFlowContext } from '@/contexts/flow-context';
 import { useLayoutContext } from '@/contexts/layout-context';
 import { useNodeContext } from '@/contexts/node-context';
@@ -60,24 +60,23 @@ export function FileInputNode({
   const [portfolioPositions, setPortfolioPositions] = useNodeState<ParsedPosition[]>(id, 'portfolioPositions', []);
   const [inputType, setInputType] = useNodeState<string>(id, 'inputType', '');
   const [fileName, setFileName] = useNodeState<string>(id, 'fileName', '');
-  
+
   const [runMode, setRunMode] = useNodeState(id, 'runMode', 'single');
-  const [initialCash, setInitialCash] = useNodeState(id, 'initialCash', '100000');
   const [startDate, setStartDate] = useNodeState(id, 'startDate', threeMonthsAgo.toISOString().split('T')[0]);
   const [endDate, setEndDate] = useNodeState(id, 'endDate', today.toISOString().split('T')[0]);
-  
+
   const [open, setOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const { currentFlowId } = useFlowContext();
   const nodeContext = useNodeContext();
   const { getAllAgentModels } = nodeContext;
   const { getNodes, getEdges } = useReactFlow();
   const { expandBottomPanel, setBottomPanelTab } = useLayoutContext();
-  
+
   const flowId = currentFlowId?.toString() || null;
   const {
     isConnecting,
@@ -89,8 +88,13 @@ export function FileInputNode({
     stopFlow,
     recoverFlowState
   } = useFlowConnection(flowId);
-  
-  const canRunHedgeFund = canRun && (tickers.length > 0 || portfolioPositions.length > 0);
+
+  // Check if we have valid positions or tickers based on mode
+  const hasValidInputs = inputType === 'portfolio' 
+    ? portfolioPositions?.length > 0 && portfolioPositions.every(p => p.ticker.trim() !== '')
+    : tickers?.length > 0 && tickers.every(t => t.trim() !== '');
+    
+  const canRunHedgeFund = canRun && hasValidInputs;
   
   useKeyboardShortcuts({
     shortcuts: [
@@ -121,19 +125,19 @@ export function FileInputNode({
     setFileName(file.name);
     setIsUploading(true);
     setUploadError(null);
-    setTickers([]);
-    setPortfolioPositions([]);
-    setInputType('');
 
     try {
       const result = await api.uploadFile(file);
       if (result.type === 'portfolio') {
+        const positions = result.positions || [];
         setInputType('portfolio');
-        setPortfolioPositions(result.positions || []);
-        setTickers(result.positions.map((p: ParsedPosition) => p.ticker));
+        setPortfolioPositions([...positions]);
+        setTickers([...positions.map((p: ParsedPosition) => p.ticker)]);
       } else {
+        const tickers = result.tickers || [];
         setInputType('stock');
-        setTickers(result.tickers || []);
+        setTickers([...tickers]);
+        setPortfolioPositions([]);
       }
     } catch (error: unknown) {
       console.error('File upload error:', error);
@@ -147,16 +151,36 @@ export function FileInputNode({
     }
   };
 
-  const handleInitialCashChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numericValue = e.target.value.replace(/[^0-9.]/g, '');
-    setInitialCash(numericValue);
+  const handlePositionChange = (index: number, field: keyof ParsedPosition, value: string) => {
+    const newPositions = [...portfolioPositions];
+    (newPositions[index] as any)[field] = value;
+    
+    // Clear out alternate price keys if setting tradePrice explicitly
+    if (field === 'tradePrice') {
+       (newPositions[index] as any)['trade_price'] = undefined;
+       (newPositions[index] as any)['price'] = undefined;
+    }
+    
+    setPortfolioPositions(newPositions);
+    
+    if (field === 'ticker') {
+      setTickers(newPositions.map(p => p.ticker));
+    }
   };
 
-  const formatCurrency = (value: string) => {
-    if (!value) return '';
-    const num = parseFloat(value);
-    if (isNaN(num)) return value;
-    return num.toLocaleString('en-US');
+  const addPosition = () => {
+    setPortfolioPositions([...portfolioPositions, { ticker: '', quantity: '', tradePrice: '' }]);
+  };
+
+  const removePosition = (index: number) => {
+    const newPositions = portfolioPositions.filter((_, i) => i !== index);
+    setPortfolioPositions(newPositions);
+    setTickers(newPositions.map(p => p.ticker));
+  };
+
+  const handleTickersChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setTickers(val ? val.split(',').map(t => t.toUpperCase().trim()) : []);
   };
 
   const handleStop = () => {
@@ -177,9 +201,7 @@ export function FileInputNode({
       if (visited.has(nodeId)) return;
       visited.add(nodeId);
       
-      if (nodeId !== id) {
-        reachableNodes.add(nodeId);
-      }
+      reachableNodes.add(nodeId);
       
       const outgoingEdges = allEdges.filter(edge => edge.source === nodeId);
       for (const edge of outgoingEdges) {
@@ -189,8 +211,8 @@ export function FileInputNode({
     
     dfs(id);
     
-    const agentNodes = allNodes.filter(node => reachableNodes.has(node.id));
-    const reachableNodeIds = new Set([id, ...reachableNodes]);
+    const agentNodes = allNodes.filter(node => reachableNodes.has(node.id) && node.id !== id);
+    const reachableNodeIds = reachableNodes;
     const validEdges = allEdges.filter(edge => 
       reachableNodeIds.has(edge.source) && reachableNodeIds.has(edge.target)
     );
@@ -209,17 +231,19 @@ export function FileInputNode({
     }
     
     let processedPositions = undefined;
-    if (inputType === 'portfolio') {
-      processedPositions = portfolioPositions.map((pos: ParsedPosition) => ({
-        ticker: pos.ticker,
-        quantity: parseFloat(String(pos.quantity)) || 0,
-        trade_price: parseFloat(String(pos.tradePrice || pos.trade_price || pos.price)) || 0
+    if (inputType === 'portfolio' && portfolioPositions) {
+      processedPositions = portfolioPositions
+        .filter(pos => pos.ticker.trim() !== '' && String(pos.quantity).trim() !== '' && String(pos.tradePrice || pos.trade_price || pos.price).trim() !== '')
+        .map((pos: ParsedPosition) => ({
+          ticker: pos.ticker,
+          quantity: parseFloat(String(pos.quantity)) || 0,
+          trade_price: parseFloat(String(pos.tradePrice || pos.trade_price || pos.price)) || 0
       }));
     }
     
     if (runMode === 'backtest') {
       runBacktest({
-        tickers: tickers,
+        tickers: tickers || [],
         graph_nodes: agentNodes.map(node => ({
           id: node.id,
           type: node.type,
@@ -230,7 +254,7 @@ export function FileInputNode({
         agent_models: agentModels,
         start_date: startDate,
         end_date: endDate,
-        initial_capital: parseFloat(initialCash) || 100000,
+        initial_capital: 100000,
         margin_requirement: 0.0,
         model_name: undefined,
         model_provider: undefined,
@@ -238,7 +262,7 @@ export function FileInputNode({
       });
     } else {
       runFlow({
-        tickers: tickers,
+        tickers: tickers || [],
         graph_nodes: agentNodes.map(node => ({
           id: node.id,
           type: node.type,
@@ -251,7 +275,7 @@ export function FileInputNode({
         model_provider: undefined,
         start_date: startDate,
         end_date: endDate,
-        initial_cash: parseFloat(initialCash) || 100000,
+        initial_cash: 100000,
         portfolio_positions: processedPositions,
       });
     }
@@ -311,20 +335,16 @@ export function FileInputNode({
                 </Button>
 
                 {fileName && !isUploading && !uploadError && (
-                  <div className="flex flex-col gap-1 mt-1 p-2 bg-accent/50 rounded-md border border-border/50">
-                    <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      <span className="truncate">{fileName}</span>
+                  <div className="flex flex-col gap-2 mt-1 p-2 bg-accent/50 rounded-md border border-border/50">
+                    <div className="flex items-center justify-between text-sm font-medium text-foreground">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        <span className="truncate">{fileName}</span>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground uppercase bg-background px-1.5 py-0.5 rounded border border-border/50">
+                        {inputType} Mode
+                      </span>
                     </div>
-                    {inputType === 'portfolio' ? (
-                      <div className="text-xs text-muted-foreground pl-6">
-                        Portfolio parsed: {portfolioPositions.length} positions
-                      </div>
-                    ) : inputType === 'stock' ? (
-                      <div className="text-xs text-muted-foreground pl-6">
-                        Stocks parsed: {tickers.join(', ')}
-                      </div>
-                    ) : null}
                   </div>
                 )}
                 
@@ -334,6 +354,95 @@ export function FileInputNode({
                   </div>
                 )}
               </div>
+
+              {/* Dynamic Inputs (Stock or Portfolio) */}
+              {inputType === 'stock' && (
+                <div className="flex flex-col gap-2">
+                  <div className="text-subtitle text-primary flex items-center gap-1">
+                    <Tooltip delayDuration={200}>
+                      <TooltipTrigger asChild>
+                        <span>Tickers</span>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        You can add multiple tickers using commas (AAPL,NVDA,TSLA)
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <Input
+                    placeholder="Enter tickers"
+                    value={tickers?.join(', ') || ''}
+                    onChange={handleTickersChange}
+                  />
+                </div>
+              )}
+
+              {inputType === 'portfolio' && (
+                <>
+                  <div className="flex flex-col gap-2">
+                    <div className="text-subtitle text-primary flex items-center gap-1">
+                      <Tooltip delayDuration={200}>
+                        <TooltipTrigger asChild>
+                          <span>Positions</span>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          Add your portfolio positions with ticker, quantity, and trade price
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
+                      {portfolioPositions?.map((position, index) => (
+                        <div key={index} className="flex gap-2 items-center">
+                          <Input
+                            placeholder="Ticker"
+                            value={position.ticker}
+                            onChange={(e) => handlePositionChange(index, 'ticker', e.target.value)}
+                            className="flex-1"
+                          />
+                          <Input
+                            type="number"
+                            placeholder="Qty"
+                            value={(position.quantity || '') as string}
+                            onChange={(e) => handlePositionChange(index, 'quantity', e.target.value)}
+                            className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            step="any"
+                          />
+                          <div className="relative flex-1">
+                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none">
+                              $
+                            </div>
+                            <Input
+                              type="number"
+                              placeholder="Price"
+                              value={(position.tradePrice || position.trade_price || position.price || '') as string}
+                              onChange={(e) => handlePositionChange(index, 'tradePrice', e.target.value)}
+                              className="pl-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              step="0.01"
+                              min="0"
+                            />
+                          </div>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => removePosition(index)}
+                            className="flex-shrink-0 h-8 w-4 text-muted-foreground hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        onClick={addPosition}
+                        className="w-full mt-2 transition-all duration-200 hover:bg-primary hover:text-primary-foreground active:scale-95"
+                        size="sm"
+                        variant="secondary"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Position
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* Run Section */}
               <div className="flex flex-col gap-2">
@@ -407,23 +516,6 @@ export function FileInputNode({
                     </AccordionTrigger>
                     <AccordionContent className="pt-2">
                       <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-2">
-                          <div className="text-subtitle text-primary flex items-center gap-1">
-                            Available Cash
-                          </div>
-                          <div className="relative flex-1">
-                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none">
-                              $
-                            </div>
-                            <Input
-                              type="text"
-                              placeholder="100,000"
-                              value={formatCurrency(initialCash)}
-                              onChange={handleInitialCashChange}
-                              className="pl-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            />
-                          </div>
-                        </div>
                         <div className="flex flex-col gap-2">
                           <div className="text-subtitle text-primary flex items-center gap-1">
                             Start Date

@@ -18,8 +18,34 @@ from backend.utils.analysts import get_agents_list
 from backend.llm.models import get_model, ModelProvider
 from io import BytesIO
 from langchain_core.messages import HumanMessage
+import yfinance as yf
 
 router = APIRouter(prefix="/hedge-fund")
+
+def clean_number_string(val, is_price=False):
+    if not isinstance(val, str):
+        val = str(val)
+    # Remove all spaces
+    val = val.replace(' ', '')
+    # If it has both comma and dot (e.g. 1,234.56 or 1.234,56)
+    if ',' in val and '.' in val:
+        # If comma comes before dot, it's a thousands separator
+        if val.rfind(',') < val.rfind('.'):
+            val = val.replace(',', '')
+        # If dot comes before comma, dot is thousands separator, comma is decimal
+        else:
+            val = val.replace('.', '').replace(',', '.')
+    # If it only has comma (e.g. 7,94)
+    elif ',' in val:
+        val = val.replace(',', '.')
+        
+    if is_price:
+        try:
+            return f"{float(val):.2f}"
+        except ValueError:
+            pass
+            
+    return val
 
 @router.post(
     path="/upload",
@@ -61,11 +87,15 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
             "type": "portfolio",
             "positions": [
                 {"ticker": "AAPL", "quantity": "100", "tradePrice": "150.50"},
-                {"ticker": "MSFT", "quantity": "50", "tradePrice": "300.00"}
+                {"ticker": "MSFT", "quantity": "50"}
             ]
         }
         
-        If the file has prices/quantities, use Format 2. Otherwise use Format 1. Convert all tickers to uppercase symbols.
+        If the file has quantities, use Format 2. Otherwise use Format 1. Convert all tickers to uppercase symbols.
+        CRITICAL INSTRUCTIONS FOR FORMAT 2:
+        - "tradePrice": Extract the price ONLY if it is explicitly stated in the document. DO NOT hallucinate, guess, or look up prices. If the document does not contain a price for a position, omit the "tradePrice" field completely for that position.
+        - Normalize all numbers: DO NOT output strings with commas (,) for decimals or thousands. Convert values like "7,94" to "7.94" and "1,000.50" to "1000.50" directly in your JSON output.
+        - Precision: Keep exact precision for all trade prices (e.g. "133.97"). Do not round to whole numbers unless the source text has it rounded.
         """
 
         messages = []
@@ -97,6 +127,46 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
             response_text = response_text[3:-3].strip()
             
         result = json.loads(response_text)
+        
+        # Hydrate missing prices using yfinance for portfolio mode
+        if result.get("type") == "portfolio" and "positions" in result:
+            for position in result["positions"]:
+                ticker = position.get("ticker")
+                price = position.get("tradePrice") or position.get("price") or position.get("trade_price")
+                quantity = position.get("quantity")
+                
+                # Clean strings to float format
+                if price:
+                    position["tradePrice"] = clean_number_string(price, is_price=True)
+                if quantity:
+                    position["quantity"] = clean_number_string(quantity, is_price=False)
+                
+                # If we have a ticker and quantity but no price (or price is 0/empty), fetch it
+                if ticker and quantity and not price:
+                    try:
+                        ticker_obj = yf.Ticker(ticker)
+                        # Try to get current price
+                        current_price = None
+                        
+                        # Use fast info property if available
+                        if hasattr(ticker_obj, 'fast_info') and hasattr(ticker_obj.fast_info, 'last_price'):
+                            current_price = ticker_obj.fast_info.last_price
+                        else:
+                            # Fallback to info dict
+                            info = ticker_obj.info
+                            if "currentPrice" in info:
+                                current_price = info["currentPrice"]
+                            elif "regularMarketPrice" in info:
+                                current_price = info["regularMarketPrice"]
+                            elif "previousClose" in info:
+                                current_price = info["previousClose"]
+                            
+                        if current_price:
+                            position["tradePrice"] = f"{current_price:.2f}"
+                            print(f"Hydrated price for {ticker}: {current_price}")
+                    except Exception as e:
+                        print(f"Failed to fetch price for {ticker} using yfinance: {e}")
+
         return result
 
     except Exception as e:
