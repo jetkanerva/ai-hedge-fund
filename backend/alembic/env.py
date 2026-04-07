@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from logging.config import fileConfig
 
@@ -20,7 +20,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from backend.database.models import Base
+from app.database.models import Base
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
