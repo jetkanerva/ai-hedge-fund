@@ -1460,7 +1460,7 @@ packages:
 - pypi: ./
   name: ai-hedge-fund
   version: 1.0.0
-  sha256: 73cd95a0246e78c6ebe566bc4413b68e2eafc19c57372c8177b4aab9d9c1a05f
+  sha256: 12e2b7aad9150f6b68c5b1501e8d3427cc09c4c3f8cbdfd5b4932d88ca1a3297
   requires_dist:
   - langchain>=0.3.7
   - langchain-anthropic==0.3.5

@@ -68,6 +68,7 @@ default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "default" }
 
 [tool.pixi.tasks]
+start = "uvicorn main:app --host 0.0.0.0 --port 8000"
 build-docker = "docker build -t jetikan/runpod-backend:latest ."
 push-docker = "docker push jetikan/runpod-backend:latest"
 deploy-docker = { depends-on = ["build-docker", "push-docker"] }
