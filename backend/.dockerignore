@@ -23,7 +23,6 @@ __pycache__/
 
 # Logs and data
 logs/
-data/
 *.log
 
 # OS specific

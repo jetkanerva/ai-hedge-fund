@@ -67,6 +67,15 @@ ai-hedge-fund = { path = ".", editable = true }
 default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "default" }
 
+[tool.pixi.tasks]
+build-docker = "docker build -t jetikan/runpod-backend:latest ."
+push-docker = "docker push jetikan/runpod-backend:latest"
+deploy-docker = { depends-on = ["build-docker", "push-docker"] }
+
+[tool.pixi.target.linux-64.tasks]
+build-docker = "sudo docker build -t jetikan/runpod-backend:latest ."
+push-docker = "sudo docker push jetikan/runpod-backend:latest"
+
 [tool.black]
 line-length = 420
 target-version = ['py311']
