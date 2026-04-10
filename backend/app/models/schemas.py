@@ -289,3 +289,37 @@ class ApiKeySummaryResponse(BaseModel):
 class ApiKeyBulkUpdateRequest(BaseModel):
     """Request to update multiple API keys at once"""
     api_keys: List[ApiKeyCreateRequest]
+
+# Organization and User schemas
+class OrganizationCreateRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+
+class OrganizationResponse(BaseModel):
+    id: int
+    name: str
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+class UserCreateRequest(BaseModel):
+    email: str = Field(..., min_length=5, max_length=255)
+    role: Optional[str] = "member"
+    organization_id: Optional[int] = None
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    role: str
+    organization_id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+    organization: Optional[OrganizationResponse] = None
+
+    class Config:
+        from_attributes = True
+
+class AddUserToOrganizationRequest(BaseModel):
+    email: str = Field(..., min_length=5, max_length=255)
+

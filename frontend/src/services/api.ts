@@ -12,6 +12,87 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const api = {
   /**
+   * Gets the current user from the database
+   */
+  getCurrentUser: async (): Promise<any> => {
+    try {
+      const response = await authFetch(`${API_BASE_URL}/organizations/users/me`);
+      if (response.status === 404) {
+        return null; // User not found in DB, needs to create organization
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch current user:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Creates a new organization
+   */
+  createOrganization: async (name: string): Promise<any> => {
+    try {
+      const response = await authFetch(`${API_BASE_URL}/organizations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name }),
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.detail || `HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to create organization:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Gets users in the current organization
+   */
+  getOrganizationUsers: async (): Promise<any[]> => {
+    try {
+      const response = await authFetch(`${API_BASE_URL}/organizations/users`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch organization users:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Adds a user to the organization
+   */
+  addUserToOrganization: async (email: string): Promise<any> => {
+    try {
+      const response = await authFetch(`${API_BASE_URL}/organizations/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.detail || `HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to add user to organization:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Gets the list of available agents from the backend
    * @returns Promise that resolves to the list of agents
    */

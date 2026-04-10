@@ -1,16 +1,20 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { api } from '@/services/api';
+import { toast } from 'sonner';
 
 export function Login() {
-  const { signInWithGoogle, signOut, loading, user } = useAuth();
+  const { signInWithGoogle, signOut, loading, user, dbUser, refreshDbUser } = useAuth();
+  const [orgName, setOrgName] = useState('');
+  const [isCreatingOrg, setIsCreatingOrg] = useState(false);
 
   if (loading) {
     return <div className="flex h-screen w-full items-center justify-center bg-background">Loading...</div>;
   }
 
-  // If user is somehow logged in but with wrong email, they'll see this screen
-  // if we restrict routing, but let's just provide the sign-in button here
   const handleGoogleLogin = async () => {
     try {
       await signInWithGoogle();
@@ -18,6 +22,63 @@ export function Login() {
       console.error('Error signing in:', error);
     }
   };
+
+  const handleCreateOrg = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!orgName.trim()) {
+      toast.error('Please enter an organization name');
+      return;
+    }
+
+    try {
+      setIsCreatingOrg(true);
+      await api.createOrganization(orgName);
+      toast.success('Organization created successfully!');
+      await refreshDbUser();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to create organization');
+    } finally {
+      setIsCreatingOrg(false);
+    }
+  };
+
+  // If user is authenticated with Google but not in DB
+  if (user && !dbUser) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Create an Organization</CardTitle>
+            <CardDescription>You need to be part of an organization to use the application.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateOrg} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="orgName" className="text-sm font-medium">
+                  Organization Name
+                </label>
+                <Input
+                  id="orgName"
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                  placeholder="e.g. Acme Corp"
+                  disabled={isCreatingOrg}
+                />
+              </div>
+              <div className="flex flex-col gap-2 mt-2">
+                <Button type="submit" disabled={isCreatingOrg}>
+                  {isCreatingOrg ? 'Creating...' : 'Create Organization'}
+                </Button>
+                <Button variant="ghost" type="button" onClick={() => signOut()}>
+                  Sign out
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background p-4">
@@ -27,15 +88,6 @@ export function Login() {
           <CardDescription>Sign in to access your portfolio and agents</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {user ? (
-            <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive text-center">
-              Your email ({user.email}) is not authorized to access this application.
-              <br />
-              <Button variant="link" className="mt-2" onClick={() => signOut()}>
-                Sign out
-              </Button>
-            </div>
-          ) : null}
           <Button 
             className="w-full" 
             size="lg" 

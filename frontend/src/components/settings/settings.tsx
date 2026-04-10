@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils';
-import { Palette } from 'lucide-react';
+import { Palette, Building } from 'lucide-react';
 import { useState } from 'react';
 import { ThemeSettings } from './appearance';
+import { OrganizationSettings } from './organization';
 
 interface SettingsProps {
   className?: string;
@@ -24,12 +25,20 @@ export function Settings({ className }: SettingsProps) {
       icon: Palette,
       description: 'Theme and display preferences',
     },
+    {
+      id: 'organization',
+      label: 'Organization',
+      icon: Building,
+      description: 'Manage your organization and team',
+    },
   ];
 
   const renderContent = () => {
     switch (selectedSection) {
       case 'theme':
         return <ThemeSettings />;
+      case 'organization':
+        return <OrganizationSettings />;
       default:
         return <ThemeSettings />;
     }

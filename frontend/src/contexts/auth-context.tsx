@@ -1,34 +1,69 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { api } from '@/services/api';
+
+export interface DbUser {
+  id: number;
+  email: string;
+  role: string;
+  organization_id: number;
+  organization?: {
+    id: number;
+    name: string;
+  };
+}
 
 interface AuthContextType {
   user: User | null;
+  dbUser: DbUser | null;
   session: Session | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  refreshDbUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [dbUser, setDbUser] = useState<DbUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchDbUser = async (sessionUser: User | null) => {
+    if (!sessionUser) {
+      setDbUser(null);
+      return;
+    }
+    try {
+      const dbUserData = await api.getCurrentUser();
+      setDbUser(dbUserData);
+    } catch (error) {
+      console.error('Error fetching DB user:', error);
+      setDbUser(null);
+    }
+  };
+
+  const refreshDbUser = async () => {
+    await fetchDbUser(user);
+  };
+
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      await fetchDbUser(session?.user ?? null);
       setLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      await fetchDbUser(session?.user ?? null);
       setLoading(false);
     });
 
@@ -53,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, dbUser, session, loading, signInWithGoogle, signOut, refreshDbUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -66,3 +101,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

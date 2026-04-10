@@ -4,6 +4,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from supabase import create_client, Client
 
+from sqlalchemy.orm import Session
+from app.database.connection import get_db
+from app.database.models import User
+
 load_dotenv()
 
 security = HTTPBearer()
@@ -29,22 +33,21 @@ async def verify_user(credentials: HTTPAuthorizationCredentials = Depends(securi
         if not user:
             raise Exception("No user returned")
             
-        email = user.email
-        
-        allowed_emails_env = os.getenv("ALLOWED_EMAILS")
-        allowed_emails = [e.strip() for e in allowed_emails_env.split(",") if e.strip()]
-
-        if email not in allowed_emails:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not authorized. Your email does not have access.",
-            )
         return user
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid authentication credentials: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+def get_current_user(supabase_user = Depends(verify_user), db: Session = Depends(get_db)):
+    email = supabase_user.email
+    db_user = db.query(User).filter(User.email == email).first()
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found in organization database.",
+        )
+    return db_user
+
